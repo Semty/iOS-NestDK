@@ -16,7 +16,7 @@
 
 #import "NestThermostatManager.h"
 #import "NestAuthManager.h"
-#import "FirebaseManager.h"
+#import "RESTManager.h"
 
 @interface NestThermostatManager ()
 
@@ -26,21 +26,45 @@
 #define HAS_FAN @"has_fan"
 #define TARGET_TEMPERATURE_F @"target_temperature_f"
 #define AMBIENT_TEMPERATURE_F @"ambient_temperature_f"
+#define HVAC_MODE @"hvac_mode"
 #define NAME_LONG @"name_long"
 #define THERMOSTAT_PATH @"devices/thermostats"
 
 @implementation NestThermostatManager
 
 /**
- * Sets up a new Firebase connection for the thermostat provided
+ * Sets up a new connection for the thermostat provided
  * and observes for any change in /devices/thermostats/thermostatId.
  * @param thermostat The thermostat you want to watch changes for.
  */
 - (void)beginSubscriptionForThermostat:(Thermostat *)thermostat
 {
-    [[FirebaseManager sharedManager] addSubscriptionToURL:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId] withBlock:^(FDataSnapshot *snapshot) {
-        [self updateThermostat:thermostat forStructure:snapshot.value];
+    
+    [[RESTManager sharedManager] getData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId] success:^(NSDictionary *responseJSON) {
+        
+        NSLog(@"NestThermostatManager Success: %@", responseJSON);
+        [self updateThermostat:thermostat forStructure:responseJSON];
+        
+    } redirect:^(NSHTTPURLResponse *responseURL) {
+        
+        // If a redirect was thrown, make another call using the redirect URL
+        NSLog(@"NestThermostatManager Redirect: %@", [responseURL URL]);
+        self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
+        
+        [[RESTManager sharedManager] getDataRedirect:self.redirectURL success:^(NSDictionary *responseJSON) {
+            
+            [self updateThermostat:thermostat forStructure:responseJSON];
+            NSLog(@"NestThermostatManager Redirect Success: %@", responseJSON);
+            
+        } failure:^(NSError *error) {
+            NSLog(@"NestThermostatManager Redirect Error: %@", error);
+        }];
+        
+    } failure:^(NSError *error) {
+        NSLog(@"NestThermostatManager Error: %@", error);
     }];
+    
+    NSLog(@"NestThermostatManager - after REST");
 }
 
 /**
@@ -57,6 +81,11 @@
     if ([structure objectForKey:TARGET_TEMPERATURE_F]) {
         thermostat.targetTemperatureF = [[structure objectForKey:TARGET_TEMPERATURE_F] integerValue];
     }
+    
+    if ([structure objectForKey:HVAC_MODE]) {
+        thermostat.hvacMode = [structure objectForKey:HVAC_MODE];
+    }
+    
     if ([structure objectForKey:HAS_FAN]) {
         thermostat.hasFan = [[structure objectForKey:HAS_FAN] boolValue];
 
@@ -73,9 +102,8 @@
 }
 
 /**
- * Sets the thermostat values by using the Firebase API.
- * @param thermostat The thermost you wish to save.
- * @see https://www.firebase.com/docs/transactions.html
+ * Sets the thermostat values by using the Nest API.
+ * @param thermostat The thermostat you wish to save.\
  */
 - (void)saveChangesForThermostat:(Thermostat *)thermostat
 {
@@ -84,18 +112,29 @@
     [values setValue:[NSNumber numberWithInteger:thermostat.targetTemperatureF] forKey:TARGET_TEMPERATURE_F];
     [values setValue:[NSNumber numberWithBool:thermostat.fanTimerActive] forKey:FAN_TIMER_ACTIVE];
     
-    [[FirebaseManager sharedManager] setValues:values forURL:[NSString stringWithFormat:@"%@/%@/", THERMOSTAT_PATH, thermostat.thermostatId]];
+    NSLog(@"NestThermostatManager write");
     
-//    // IMPORTANT to set withLocalEvents to NO
-//    // Read more here: https://www.firebase.com/docs/transactions.html
-//    [self.fireBase runTransactionBlock:^FTransactionResult *(FMutableData *currentData) {
-//        [currentData setValue:values];
-//        return [FTransactionResult successWithValue:currentData];
-//    } andCompletionBlock:^(NSError *error, BOOL committed, FDataSnapshot *snapshot) {
-//        if (error) {
-//            NSLog(@"Error: %@", error);
-//        }
-//    } withLocalEvents:NO];
+    [[RESTManager sharedManager] setData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId] withValues:values success:^(NSDictionary *responseJSON) {
+        NSLog(@"NestThermostatManager Success: %@", responseJSON);
+        
+    } redirect:^(NSHTTPURLResponse *responseURL) {
+        
+        // If a redirect was thrown, make another call using the redirect URL
+        NSLog(@"NestStructureManager Redirect: %@", [responseURL URL]);
+        self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
+        
+        [[RESTManager sharedManager] setDataRedirect:self.redirectURL withValues:values success:^(NSDictionary *responseJSON) {
+            
+            NSLog(@"NestThermostatManager Redirect Success: %@", responseJSON);
+            
+        } failure:^(NSError *error) {
+            NSLog(@"NestThermostatManager Redirect Error: %@", error);
+        }];
+        
+    } failure:^(NSError *error) {
+        NSLog(@"NestThermostatManager Error: %@", error);
+    }];
+
 
 }
 

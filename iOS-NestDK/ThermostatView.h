@@ -28,6 +28,7 @@
 
 @property (nonatomic) NSInteger currentTemp;
 @property (nonatomic) NSInteger targetTemp;
+@property (nonatomic, strong) NSString *hvacMode;
 @property (nonatomic, strong) NSString *thermostatId;
 @property (nonatomic, strong) NSString *thermostateName;
 @property (nonatomic, strong) id <ThermostatViewDelegate>delegate;

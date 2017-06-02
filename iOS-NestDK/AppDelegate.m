@@ -17,6 +17,7 @@
 #import "AppDelegate.h"
 #import "MainNavigationController.h"
 #import "NestAuthManager.h"
+#import "RESTManager.h"
 #import "Constants.h"
 
 @implementation AppDelegate
@@ -28,6 +29,7 @@
     // Set the NestAuthManager's client ID and client Secret
     [[NestAuthManager sharedManager] setClientId:NestClientID];
     [[NestAuthManager sharedManager] setClientSecret:NestClientSecret];
+    [[RESTManager sharedManager] setRootEndpoint:NestAPIEndpoint];
     
     // Set the main navigation controller
     MainNavigationController *mnc = [[MainNavigationController alloc] init];

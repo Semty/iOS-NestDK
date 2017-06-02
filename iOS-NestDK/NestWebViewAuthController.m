@@ -120,6 +120,9 @@
  */
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
+    
+    NSLog(@"shouldStartLoadWithRequest start");
+    
     NSURL *url = [request URL];
     NSURL *redirectURL = [[NSURL alloc] initWithString:RedirectURL];
         
@@ -150,9 +153,13 @@
 		} else {
 			NSLog(@"Error retrieving the authorization code.");
 		}
+        
+        NSLog(@"shouldStartLoadWithRequest end");
 
 		return NO;
 	}
+    
+    NSLog(@"Redirect URL doesn't match! Make sure they match between Constants.m and your product page on console.developers.nest.com.");
 	
 	return YES;
 }

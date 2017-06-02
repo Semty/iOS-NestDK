@@ -22,6 +22,7 @@
 @property (nonatomic, strong) UILabel *currentTempLabel;
 @property (nonatomic, strong) UILabel *targetTempLabel;
 @property (nonatomic, strong) UIButton *thermostatNameLabel;
+@property (nonatomic, strong) UILabel *currentModeLabel;
 
 @property (nonatomic, strong) UILabel *currentTempSuffix;
 @property (nonatomic, strong) UILabel *targetTempSuffix;
@@ -39,10 +40,11 @@
 
 @end
 
-#define CURRENT_Y_LEVEL 40
-#define TARGET_Y_LEVEL 95
-#define FAN_Y_LEVEL 150
-#define TITLE_FONT_SIZE 22
+#define MODE_Y_LEVEL 45
+#define CURRENT_Y_LEVEL 75
+#define TARGET_Y_LEVEL 130
+#define FAN_Y_LEVEL 185
+#define TITLE_FONT_SIZE 18
 #define TEMP_HEIGHT 45
 #define SUFFIX_HEIGHT 20
 #define SUFFIX_WIDTH 160
@@ -60,11 +62,13 @@
 #define FAN_TIMER_SUFFIX_ON @"fan timer (on)"
 #define FAN_TIMER_SUFFIX_OFF @"fan timer (off)"
 #define FAN_TIMER_SUFFIX_DISABLED @"fan timer (disabled)"
+#define MODE_SUFFIX @"mode"
 
 @implementation ThermostatView
 
 @synthesize currentTemp = _currentTemp;
 @synthesize targetTemp = _targetTemp;
+@synthesize hvacMode = _hvacMode;
 
 #pragma mark Setter Methods
 
@@ -88,6 +92,16 @@
     [self updateTargetTempLabel:targetTemp];
 }
 
+/**
+ * Provide the setter for the hvac mode.
+ * @param hvacMode The hvac mode to set hvacMode to.
+ */
+- (void)setHvacMode:(NSString*)hvacMode
+{
+    _hvacMode = hvacMode;
+    [self updateCurrentModeLabel:hvacMode];
+}
+
 #pragma mark View Setup
 
 - (id)initWithFrame:(CGRect)frame
@@ -107,6 +121,7 @@
         self.thermostatNameLabel = [self setupThermostatNameLabel];
         
         // Setup the labels
+        self.currentModeLabel = [self setupModeLabelWithY:MODE_Y_LEVEL];
         self.currentTempLabel = [self setupTempLabelWithY:CURRENT_Y_LEVEL];
         self.targetTempLabel = [self setupTempLabelWithY:TARGET_Y_LEVEL];
         self.currentTempSuffix = [self setupSuffixLabelWithText:CURRENT_SUFFIX andY:CURRENT_Y_LEVEL];
@@ -160,6 +175,7 @@
     UIButton *thermostatButton = [[UIButton alloc] initWithFrame:CGRectMake(DEFAULT_PADDING, DEFAULT_PADDING, 280, 25)];
     [thermostatButton setTitle:TITLE_PLACEHOLDER forState:UIControlStateNormal];
     [thermostatButton setTitleColor:[UIColor nestBlue] forState:UIControlStateNormal];
+    thermostatButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [thermostatButton.titleLabel setFont:[UIFont fontWithName:BOLD_FONT size:TITLE_FONT_SIZE]];
     [thermostatButton addTarget:self action:@selector(thermostatNameButtonHit:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:thermostatButton];
@@ -172,6 +188,23 @@
 - (void)sliderMoving:(UISlider *)sender
 {
     self.isSlidingSlider = YES;
+}
+
+/**
+ * Setup an hvac mode label with a given Y value.
+ * @param yValue The yValue the label should be at.
+ * @return The new UILabel.
+ */
+- (UILabel *)setupModeLabelWithY:(int)yValue
+{
+    
+    UILabel *modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(DEFAULT_PADDING, yValue, self.bounds.size.width - (2 * DEFAULT_PADDING), SUFFIX_HEIGHT)];
+    [modeLabel setText:TITLE_PLACEHOLDER];
+    [modeLabel setTextColor:[UIColor darkGrayColor]];
+    [modeLabel setTextAlignment:NSTextAlignmentLeft];
+    [modeLabel setFont:[UIFont fontWithName:REGULAR_FONT size:TITLE_FONT_SIZE]];
+    [self addSubview:modeLabel];
+    return modeLabel;
 }
 
 /**
@@ -272,6 +305,21 @@
     [self.currentTempLabel setFrame:CGRectMake(DEFAULT_PADDING, CURRENT_Y_LEVEL, textSize.width, TEMP_HEIGHT)];
     [self.currentTempLabel setText:newString];
     [self.currentTempSuffix setFrame:CGRectMake(DEFAULT_PADDING + 5 + textSize.width, CURRENT_Y_LEVEL + SUFFIX_HEIGHT - 3, SUFFIX_WIDTH, SUFFIX_HEIGHT)];
+}
+
+/**
+ * Update the current hvac mode label.
+ * @param newMode The hvac mode you wish to update to.
+ */
+- (void)updateCurrentModeLabel:(NSString*)newMode
+{
+    NSString *newString = [[NSString stringWithFormat:@"%@ %@", newMode, @" mode"] uppercaseString];
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont fontWithName:REGULAR_FONT size:TITLE_FONT_SIZE]};
+    CGSize textSize = [newString sizeWithAttributes:attributes];
+    
+    [self.currentModeLabel setFrame:CGRectMake(DEFAULT_PADDING, MODE_Y_LEVEL, textSize.width, SUFFIX_HEIGHT)];
+    [self.currentModeLabel setText:newString];
 }
 
 #pragma mark Thermostat Interaction Methods
@@ -415,6 +463,9 @@
     
     // Update the name of the thermostat
     [self.thermostatNameLabel setTitle:thermostat.nameLong forState:UIControlStateNormal];
+    
+    // Update the hvac mode of the thermostat
+    self.hvacMode = thermostat.hvacMode;
     
     // Update the current temp label
     self.currentTemp = thermostat.ambientTemperatureF;

@@ -18,13 +18,10 @@
 #define iOS_NestDK_Constants_h
 
 extern NSString * const NestClientID;
-
 extern NSString * const NestClientSecret;
-
 extern NSString * const NestCurrentAPIDomain;
-
 extern NSString * const NestState;
-
 extern NSString * const RedirectURL;
+extern NSString * const NestAPIEndpoint;
 
 #endif

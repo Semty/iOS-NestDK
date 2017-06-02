@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A987C241EDDF721009DDED2 /* RESTManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A987C231EDDF721009DDED2 /* RESTManager.m */; };
+		8AE9C7571ED8CA9E00DD3526 /* libicucore.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AE9C7561ED8CA9E00DD3526 /* libicucore.tbd */; };
+		8AE9C75A1ED8CB3B00DD3526 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AE9C7581ED8CAD500DD3526 /* XCTest.framework */; };
 		AF26D5C01951EC8C00450E99 /* NestWebViewAuthController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF26D5BF1951EC8C00450E99 /* NestWebViewAuthController.m */; };
 		AF26D5C3195210CC00450E99 /* NestControlsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF26D5C2195210CC00450E99 /* NestControlsViewController.m */; };
 		AF26D60E19522AF100450E99 /* ThermostatView.m in Sources */ = {isa = PBXBuildFile; fileRef = AF26D60D19522AF100450E99 /* ThermostatView.m */; };
@@ -14,7 +17,6 @@
 		AF26D6141952606C00450E99 /* NestStructureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = AF26D6131952606C00450E99 /* NestStructureManager.m */; };
 		AF7BD6BE195DEFB500296A8C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = AF7BD6BD195DEFB500296A8C /* Constants.m */; };
 		AF95AB381953281A006FD4A4 /* Thermostat.m in Sources */ = {isa = PBXBuildFile; fileRef = AF95AB371953281A006FD4A4 /* Thermostat.m */; };
-		AF9CCB351954FC7200EE6D38 /* FirebaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = AF9CCB341954FC7200EE6D38 /* FirebaseManager.m */; };
 		AFCD57A619621A1B001DD6B6 /* Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFCD57A519621A1B001DD6B6 /* Firebase.framework */; };
 		AFE7212E1950E7EF0082270D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE7212D1950E7EF0082270D /* Foundation.framework */; };
 		AFE721301950E7EF0082270D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE7212F1950E7EF0082270D /* CoreGraphics.framework */; };
@@ -23,7 +25,6 @@
 		AFE7213A1950E7F00082270D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE721391950E7F00082270D /* main.m */; };
 		AFE7213E1950E7F00082270D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE7213D1950E7F00082270D /* AppDelegate.m */; };
 		AFE721401950E7F00082270D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFE7213F1950E7F00082270D /* Images.xcassets */; };
-		AFE721471950E7F00082270D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE721461950E7F00082270D /* XCTest.framework */; };
 		AFE721481950E7F00082270D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE7212D1950E7EF0082270D /* Foundation.framework */; };
 		AFE721491950E7F00082270D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE721311950E7EF0082270D /* UIKit.framework */; };
 		AFE721511950E7F00082270D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AFE7214F1950E7F00082270D /* InfoPlist.strings */; };
@@ -33,8 +34,7 @@
 		AFE721681950ED790082270D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE721671950ED790082270D /* QuartzCore.framework */; };
 		AFE7216A1950ED7D0082270D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE721691950ED7D0082270D /* Security.framework */; };
 		AFE7216C1950ED810082270D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE7216B1950ED810082270D /* CFNetwork.framework */; };
-		AFE7216E1950ED850082270D /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE7216D1950ED850082270D /* libicucore.dylib */; };
-		AFE721701950ED8B0082270D /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE7216F1950ED8B0082270D /* libc++.dylib */; };
+		AFE721701950ED8B0082270D /* libc++.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE7216F1950ED8B0082270D /* libc++.1.tbd */; };
 		AFE721741950F2620082270D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE721731950F2620082270D /* SystemConfiguration.framework */; };
 		AFE721781950F3FB0082270D /* NestAuthManager.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE721771950F3FB0082270D /* NestAuthManager.m */; };
 		AFE7217C1950FE2D0082270D /* AccessToken.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE7217B1950FE2D0082270D /* AccessToken.m */; };
@@ -52,6 +52,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8A987C221EDDF70C009DDED2 /* RESTManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RESTManager.h; sourceTree = "<group>"; };
+		8A987C231EDDF721009DDED2 /* RESTManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RESTManager.m; sourceTree = "<group>"; };
+		8AE9C7561ED8CA9E00DD3526 /* libicucore.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libicucore.tbd; path = usr/lib/libicucore.tbd; sourceTree = SDKROOT; };
+		8AE9C7581ED8CAD500DD3526 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		AF26D5BE1951EC8C00450E99 /* NestWebViewAuthController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NestWebViewAuthController.h; sourceTree = "<group>"; };
 		AF26D5BF1951EC8C00450E99 /* NestWebViewAuthController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NestWebViewAuthController.m; sourceTree = "<group>"; };
 		AF26D5C1195210CC00450E99 /* NestControlsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NestControlsViewController.h; sourceTree = "<group>"; };
@@ -65,8 +69,6 @@
 		AF7BD6BD195DEFB500296A8C /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		AF95AB361953281A006FD4A4 /* Thermostat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Thermostat.h; sourceTree = "<group>"; };
 		AF95AB371953281A006FD4A4 /* Thermostat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Thermostat.m; sourceTree = "<group>"; };
-		AF9CCB331954FC7200EE6D38 /* FirebaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FirebaseManager.h; sourceTree = "<group>"; };
-		AF9CCB341954FC7200EE6D38 /* FirebaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FirebaseManager.m; sourceTree = "<group>"; };
 		AFCD57A519621A1B001DD6B6 /* Firebase.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Firebase.framework; path = third_party/Firebase.framework; sourceTree = "<group>"; };
 		AFE7212A1950E7EF0082270D /* iOS-NestDK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS-NestDK.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFE7212D1950E7EF0082270D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -80,7 +82,6 @@
 		AFE7213D1950E7F00082270D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		AFE7213F1950E7F00082270D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		AFE721451950E7F00082270D /* iOS-NestDKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS-NestDKTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AFE721461950E7F00082270D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		AFE7214E1950E7F00082270D /* iOS-NestDKTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iOS-NestDKTests-Info.plist"; sourceTree = "<group>"; };
 		AFE721501950E7F00082270D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		AFE721521950E7F00082270D /* iOS_NestDKTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iOS_NestDKTests.m; sourceTree = "<group>"; };
@@ -91,8 +92,7 @@
 		AFE721671950ED790082270D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AFE721691950ED7D0082270D /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		AFE7216B1950ED810082270D /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		AFE7216D1950ED850082270D /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
-		AFE7216F1950ED8B0082270D /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		AFE7216F1950ED8B0082270D /* libc++.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.1.tbd"; path = "../iPhoneOS.sdk/usr/lib/libc++.1.tbd"; sourceTree = SDKROOT; };
 		AFE721731950F2620082270D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		AFE721751950F3670082270D /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		AFE721761950F3FB0082270D /* NestAuthManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NestAuthManager.h; sourceTree = "<group>"; };
@@ -108,9 +108,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AE9C7571ED8CA9E00DD3526 /* libicucore.tbd in Frameworks */,
 				AFE721741950F2620082270D /* SystemConfiguration.framework in Frameworks */,
-				AFE721701950ED8B0082270D /* libc++.dylib in Frameworks */,
-				AFE7216E1950ED850082270D /* libicucore.dylib in Frameworks */,
+				AFE721701950ED8B0082270D /* libc++.1.tbd in Frameworks */,
 				AFE7216C1950ED810082270D /* CFNetwork.framework in Frameworks */,
 				AFE7216A1950ED7D0082270D /* Security.framework in Frameworks */,
 				AFCD57A619621A1B001DD6B6 /* Firebase.framework in Frameworks */,
@@ -125,9 +125,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AFE721471950E7F00082270D /* XCTest.framework in Frameworks */,
 				AFE721491950E7F00082270D /* UIKit.framework in Frameworks */,
 				AFE721481950E7F00082270D /* Foundation.framework in Frameworks */,
+				8AE9C75A1ED8CB3B00DD3526 /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -165,17 +165,17 @@
 		AFE7212C1950E7EF0082270D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8AE9C7581ED8CAD500DD3526 /* XCTest.framework */,
+				8AE9C7561ED8CA9E00DD3526 /* libicucore.tbd */,
 				AFE721731950F2620082270D /* SystemConfiguration.framework */,
-				AFE7216F1950ED8B0082270D /* libc++.dylib */,
+				AFE7216F1950ED8B0082270D /* libc++.1.tbd */,
 				AFCD57A519621A1B001DD6B6 /* Firebase.framework */,
-				AFE7216D1950ED850082270D /* libicucore.dylib */,
 				AFE7216B1950ED810082270D /* CFNetwork.framework */,
 				AFE721691950ED7D0082270D /* Security.framework */,
 				AFE721671950ED790082270D /* QuartzCore.framework */,
 				AFE7212D1950E7EF0082270D /* Foundation.framework */,
 				AFE7212F1950E7EF0082270D /* CoreGraphics.framework */,
 				AFE721311950E7EF0082270D /* UIKit.framework */,
-				AFE721461950E7F00082270D /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -250,8 +250,8 @@
 		AFE721791950F4020082270D /* Nest API */ = {
 			isa = PBXGroup;
 			children = (
-				AF9CCB331954FC7200EE6D38 /* FirebaseManager.h */,
-				AF9CCB341954FC7200EE6D38 /* FirebaseManager.m */,
+				8A987C221EDDF70C009DDED2 /* RESTManager.h */,
+				8A987C231EDDF721009DDED2 /* RESTManager.m */,
 				AF26D60F1952517200450E99 /* NestThermostatManager.h */,
 				AF26D6101952517200450E99 /* NestThermostatManager.m */,
 				AF26D6121952606C00450E99 /* NestStructureManager.h */,
@@ -321,7 +321,7 @@
 		AFE721221950E7EF0082270D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Nest Labs";
 				TargetAttributes = {
 					AFE721441950E7F00082270D = {
@@ -373,10 +373,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				AFE7215E1950E8470082270D /* NestConnectViewController.m in Sources */,
+				8A987C241EDDF721009DDED2 /* RESTManager.m in Sources */,
 				AF26D5C3195210CC00450E99 /* NestControlsViewController.m in Sources */,
 				AFE7213E1950E7F00082270D /* AppDelegate.m in Sources */,
 				AFE721661950E8890082270D /* UIColor+Custom.m in Sources */,
-				AF9CCB351954FC7200EE6D38 /* FirebaseManager.m in Sources */,
 				AF7BD6BE195DEFB500296A8C /* Constants.m in Sources */,
 				AFE7213A1950E7F00082270D /* main.m in Sources */,
 				AF26D60E19522AF100450E99 /* ThermostatView.m in Sources */,
@@ -441,13 +441,19 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -460,7 +466,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -479,20 +485,25 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -512,6 +523,7 @@
 				GCC_PREFIX_HEADER = "iOS-NestDK/iOS-NestDK-Prefix.pch";
 				INFOPLIST_FILE = "iOS-NestDK/iOS-NestDK-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nestlabs.iOS-NestDK.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -531,6 +543,7 @@
 				GCC_PREFIX_HEADER = "iOS-NestDK/iOS-NestDK-Prefix.pch";
 				INFOPLIST_FILE = "iOS-NestDK/iOS-NestDK-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nestlabs.iOS-NestDK.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -552,6 +565,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "iOS-NestDKTests/iOS-NestDKTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nestlabs.iOS-NestDK.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -570,6 +584,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "iOS-NestDK/iOS-NestDK-Prefix.pch";
 				INFOPLIST_FILE = "iOS-NestDKTests/iOS-NestDKTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nestlabs.iOS-NestDK.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;

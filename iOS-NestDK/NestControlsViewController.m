@@ -63,7 +63,7 @@
  */
 - (void)addTapToSwitchLabel
 {
-    self.statusLabel = [[UILabel alloc] initWithFrame:CGRectMake( 10, CGRectGetMidY(self.scrollView.frame), 300, 130)];
+    self.statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 255, 300, 25)];
     [self.statusLabel setText:@""];
     [self.statusLabel setTextAlignment:NSTextAlignmentCenter];
     [self.statusLabel setTextColor:[UIColor nestBlue]];
@@ -89,9 +89,22 @@
  */
 - (void)setupThermostatView
 {
-    self.thermostatView = [[ThermostatView alloc] initWithFrame:CGRectMake(10, 10, 300, 195)];
+    self.thermostatView = [[ThermostatView alloc] initWithFrame:CGRectMake(10, 10, 300, 235)];
     [self.thermostatView setDelegate:self];
     [self.scrollView addSubview:self.thermostatView];
+}
+
+/**
+ * Sets up the error view.
+ */
+- (void)setupErrorView
+{
+    self.statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 255, 300, 25)];
+    [self.statusLabel setText:@""];
+    [self.statusLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.statusLabel setTextColor:[UIColor nestBlue]];
+    [self.statusLabel setFont:[UIFont fontWithName:@"HelveticaNeue" size:22.f]];
+    [self.scrollView addSubview:self.statusLabel];
 }
 
 #pragma mark - View Controller Life Cycle
