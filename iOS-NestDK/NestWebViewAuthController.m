@@ -116,12 +116,13 @@
 }
 
 /**
- * Intercept the requests to get the authorization code.
+ * Intercept the requests to get the authorization code before the webView loads
+ * 
+ * Ideally, the redirect URI contains a server-side script to obtain the access token, 
+ *   to keep it from being exposed client-side.
  */
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
-    
-    NSLog(@"shouldStartLoadWithRequest start");
     
     NSURL *url = [request URL];
     NSURL *redirectURL = [[NSURL alloc] initWithString:RedirectURL];
@@ -153,8 +154,6 @@
 		} else {
 			NSLog(@"Error retrieving the authorization code.");
 		}
-        
-        NSLog(@"shouldStartLoadWithRequest end");
 
 		return NO;
 	}

@@ -23,22 +23,22 @@
 - (void)setRootEndpoint:(NSString *)rootURL;
 
 - (void)getData:(NSString *)endpoint
-    success:(void (^)(NSDictionary *response))success
-    redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
-    failure:(void(^)(NSError* error))failure;
-
-- (void)getDataRedirect:(NSString *)endpoint
         success:(void (^)(NSDictionary *response))success
+       redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
         failure:(void(^)(NSError* error))failure;
 
-- (void)setData:(NSString *)endpoint withValues:(NSDictionary *)values
+- (void)getDataRedirect:(NSString *)endpoint
+                success:(void (^)(NSDictionary *response))success
+                failure:(void(^)(NSError* error))failure;
+
+- (void)setData:(NSString *)endpoint
+     withValues:(NSDictionary *)values
         success:(void (^)(NSDictionary *response))success
         redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
         failure:(void(^)(NSError* error))failure;
 
 - (void)setDataRedirect:(NSString *)endpoint withValues:(NSDictionary *)values
-        success:(void (^)(NSDictionary *response))success
-        failure:(void(^)(NSError* error))failure;
-
+                success:(void (^)(NSDictionary *response))success
+                failure:(void(^)(NSError* error))failure;
 
 @end

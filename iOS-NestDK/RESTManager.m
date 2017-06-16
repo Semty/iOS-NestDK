@@ -44,8 +44,8 @@
 }
 
 /**
- * Get the URL to get the authorizationcode.
- * @return The URL to get the authorization code (the login with nest screen).
+ * Get the endpoint for the Nest API.
+ * @return The root endpoint that forms the base of all Nest API requests.
  */
 - (NSString *)endpointURL
 {
@@ -59,8 +59,8 @@
 }
 
 /**
- * Set the client's ID.
- * @param clientId The client. Generally set in the app delegate
+ * Set the root endpoint.
+ * @param rootURL The root endpoint you wish to write to NSUserdefaults.
  */
 - (void)setRootEndpoint:(NSString *)rootURL
 {
@@ -68,107 +68,86 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (void)getData:(NSString *)endpoint success:(void (^)(NSDictionary *response))success redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect failure:(void(^)(NSError* error))failure {
+#pragma mark REST methods
 
-    // making a GET request
+/**
+ * Create an HTTP request.
+ * @param type The type of request, only GET and PUT is supported.
+ * @param endpoint The Nest API endpoint to call.
+ * @param data The key-value pairs to write to the Nest API for PUT calls, nil if a GET call
+ */
+- (NSMutableURLRequest *)createRequest:(NSString *)type forEndpoint:(NSString *)endpoint withData:(NSData *)data
+{
+
     NSString *authBearer = [NSString stringWithFormat:@"Bearer %@",
                             [[NestAuthManager sharedManager] accessToken]];
     
-    NSString *targetURL = [NSString stringWithFormat:@"%@/%@", NestAPIEndpoint, endpoint];
-    
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     
-    [request setHTTPMethod:@"GET"];
-    //[request setValue:@"text/event-stream" forHTTPHeaderField:@"Accept"];
-    //[request setValue:@"no-cache" forHTTPHeaderField:@"Cache-Control"];
+    [request setHTTPMethod:type];
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [request setValue:authBearer forHTTPHeaderField:@"Authorization"];
-    [request setURL:[NSURL URLWithString:targetURL]];
+    [request setURL:[NSURL URLWithString:endpoint]];
     
-    NSLog(@"RESTManager Request %@", request);
+    if (data) {
+        [request setHTTPBody:data];
+    }
     
-    //NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    //[connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-    //[connection start];
-    //[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    
-    //EventSource *source = [EventSource eventSourceWithURL:[NSURL URLWithString:targetURL] mobileKey:authBearer];
-    //[source onMessage:^(Event *e) {
-    //    NSLog(@"%@: %@", e.event, e.data);
-    //}];
-    
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    return request;
+}
 
+
+/**
+ * Perform a GET (read) request.
+ * @param endpoint The Nest API endpoint to call.
+ * @param success Block to call after a successful response.
+ * @param redirect Block to call after a redirect response.
+ * @param failure Block to call after a failure response.
+ */
+- (void)getData:(NSString *)endpoint success:(void (^)(NSDictionary *response))success redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect failure:(void(^)(NSError* error))failure {
+    
+    // Build the HTTP request
+    NSString *targetURL = [NSString stringWithFormat:@"%@/%@", NestAPIEndpoint, endpoint];
+    NSMutableURLRequest *request = [self createRequest:@"GET" forEndpoint:targetURL withData:nil];
+    
+    // Assign the session to the main queue so the call happens immediately
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
+    
     [[session dataTaskWithRequest:request completionHandler:
       ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
 
           NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
           NSLog(@"RESTManager Response Status Code: %ld", (long)[httpResponse statusCode]);
           
-          if ((long)[httpResponse statusCode] == 401) {
+          if ((long)[httpResponse statusCode] == 401 || (long)[httpResponse statusCode] == 307) {
               self.redirectURL = [NSString stringWithFormat:@"%@", [httpResponse URL]];
               redirect(httpResponse);
+              
           }
           else if (error)
               failure(error);
           else {
               NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-              NSLog(@"RESTManager REST data received");
               success(requestJSON);
           }
 
     }] resume];
-    
-    
-    // From Postman
-    
-    //NSDictionary *headers = @{ @"content-type": @"application/json",
-    //                           @"authorization": @"Bearer c.01zPaezETxsVPRh28878orsKdt2hS9D9ljb8omu21pgT68AFW4kG120xTZDPyUFc3cvTWG56mJ0NOvhJfyhtMVSq4z4IAjRJKMxzSy0KzstGWzDjOWdy09yuKUqBtrKFSuy9FcxFsOivR5d2",
-    //                           @"cache-control": @"no-cache",
-    //                          @"postman-token": @"671def1e-caf7-3755-29ad-5fa2b105fcc9" };
-    
-    //NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://developer-api.nest.com/structures"]
-    //                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy
-    //                                                   timeoutInterval:10.0];
-    //[request setHTTPMethod:@"GET"];
-    //[request setAllHTTPHeaderFields:headers];
-    
-    //NSURLSession *session = [NSURLSession sharedSession];
-    //NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request
-    //                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-    //                                                if (error) {
-    //                                                    NSLog(@"%@", error);
-    //                                                } else {
-    //                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-    //                                                    NSLog(@"%@", httpResponse);
-    //                                                    NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-    //                                                    NSLog(@"POSTMAN REST data received: %@ %@", requestJSON, response);
-    //                                                }
-    //                                            }];
-    //[dataTask resume];
 
 }
 
+/**
+ * Perform a GET (read) request for a redirect (received by a previous GET request).
+ * @param endpoint The Nest API endpoint to call.
+ * @param success Block to call after a successful response.
+ * @param failure Block to call after a failure response.
+ */
 - (void)getDataRedirect:(NSString *)endpoint success:(void (^)(NSDictionary *response))success failure:(void(^)(NSError* error))failure {
     
-    // making a GET request
-    NSString *authBearer = [NSString stringWithFormat:@"Bearer %@",
-                            [[NestAuthManager sharedManager] accessToken]];
+    // Build the HTTP request
+    NSMutableURLRequest *request = [self createRequest:@"GET" forEndpoint:endpoint withData:nil];
     
-    NSString *targetURL = [NSString stringWithFormat:@"%@", endpoint];
-    
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-    
-    [request setHTTPMethod:@"GET"];
-    //[request setValue:@"text/event-stream" forHTTPHeaderField:@"Accept"];
-    //[request setValue:@"no-cache" forHTTPHeaderField:@"Cache-Control"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:authBearer forHTTPHeaderField:@"Authorization"];
-    [request setURL:[NSURL URLWithString:targetURL]];
-    
-    NSLog(@"RESTManager Redirect Request %@", request);
-    
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    // Assign the session to the main queue so the call happens immediately
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
     
     [[session dataTaskWithRequest:request completionHandler:
       ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -180,7 +159,6 @@
               failure(error);
           else {
               NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-              NSLog(@"RESTManager Redirect REST data received: %@ %@", requestJSON, response);
               success(requestJSON);
           }
           
@@ -188,23 +166,23 @@
     
 }
 
-
+/**
+ * Perform a PUT (write) request.
+ * @param endpoint The Nest API endpoint to write to.
+ * @param values The key-value pairs to update the endpoint with.
+ * @param success Block to call after a successful response.
+ * @param redirect Block to call after a redirect response.
+ * @param failure Block to call after a failure response.
+ */
 - (void)setData:(NSString *)endpoint withValues:(NSDictionary *)values success:(void (^)(NSDictionary *response))success redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect failure:(void(^)(NSError* error))failure {
     
-    NSString *authBearer = [NSString stringWithFormat:@"Bearer %@",
-                            [[NestAuthManager sharedManager] accessToken]];
+    // Build the HTTP request
     NSString *targetURL = [NSString stringWithFormat:@"%@/%@", NestAPIEndpoint, endpoint];
     NSData *postData = [NSJSONSerialization dataWithJSONObject:values options:kNilOptions error:nil];
+    NSMutableURLRequest *request = [self createRequest:@"PUT" forEndpoint:targetURL withData:postData];
     
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-    
-    [request setHTTPMethod:@"PUT"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:authBearer forHTTPHeaderField:@"Authorization"];
-    [request setURL:[NSURL URLWithString:targetURL]];
-    [request setHTTPBody:postData];
-    
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    // Assign the session to the main queue so the call happens immediately
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
     
     [[session dataTaskWithRequest:request completionHandler:
       ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -212,7 +190,7 @@
           NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
           NSLog(@"RESTManager Response Status Code: %ld", (long)[httpResponse statusCode]);
           
-          if ((long)[httpResponse statusCode] == 401) {
+          if ((long)[httpResponse statusCode] == 401 || (long)[httpResponse statusCode] == 307) {
               self.redirectURL = [NSString stringWithFormat:@"%@", [httpResponse URL]];
               redirect(httpResponse);
           }
@@ -220,7 +198,6 @@
               failure(error);
           else {
               NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-              NSLog(@"RESTManager data set: %@ %@", requestJSON, response);
               success(requestJSON);
           }
           
@@ -228,22 +205,21 @@
     
 }
 
+/**
+ * Perform a PUT (write) request (received by a previous PUT request).
+ * @param endpoint The Nest API endpoint to write to.
+ * @param values The key-value pairs to update the endpoint with.
+ * @param success Block to call after a successful response.
+ * @param failure Block to call after a failure response.
+ */
 - (void)setDataRedirect:(NSString *)endpoint withValues:(NSDictionary *)values success:(void (^)(NSDictionary *response))success failure:(void(^)(NSError* error))failure {
-    
-    NSString *authBearer = [NSString stringWithFormat:@"Bearer %@",
-                            [[NestAuthManager sharedManager] accessToken]];
-    NSString *targetURL = [NSString stringWithFormat:@"%@", endpoint];
+
+    // Build the HTTP request
     NSData *postData = [NSJSONSerialization dataWithJSONObject:values options:kNilOptions error:nil];
+    NSMutableURLRequest *request = [self createRequest:@"PUT" forEndpoint:endpoint withData:postData];
     
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-    
-    [request setHTTPMethod:@"PUT"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:authBearer forHTTPHeaderField:@"Authorization"];
-    [request setURL:[NSURL URLWithString:targetURL]];
-    [request setHTTPBody:postData];
-    
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    // Assign the session to the main queue so the call happens immediately
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
     
     [[session dataTaskWithRequest:request completionHandler:
       ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -255,7 +231,6 @@
               failure(error);
           else {
               NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-              NSLog(@"RESTManager Redirect data set: %@ %@", requestJSON, response);
               success(requestJSON);
           }
           
@@ -263,44 +238,5 @@
     
 }
 
-
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    // Create the response data
-    self.responseData = [[NSMutableData alloc] init];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    // Append the new data to the instance variable you declared
-    [self.responseData appendData:data];
-}
-
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse*)cachedResponse {
-    // Return nil to indicate not necessary to store a cached response for this connection
-    return nil;
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
-    // The request is complete and data has been received
-    // You can parse the stuff in your instance variable now
-    //NSError* error;
-    //NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:self.responseData options:kNilOptions error:&error];
-    //NSLog(@"REST data received from connection: %@", requestJSON);
-    
-    // Store the access key
-    //long expiresIn = [[json objectForKey:@"expires_in"] longValue];
-    //NSString *accessToken = [json objectForKey:@"access_token"];
-    //[self setAccessToken:accessToken withExpiration:expiresIn];
-    
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    // The request has failed for some reason!
-    NSLog(@"Failed to connect to the Nest API!");
-}
 
 @end

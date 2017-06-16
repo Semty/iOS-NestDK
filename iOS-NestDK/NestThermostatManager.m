@@ -20,6 +20,8 @@
 
 @interface NestThermostatManager ()
 
+@property (nonatomic, strong) NSTimer *pollTimer;
+
 @end
 
 #define FAN_TIMER_ACTIVE @"fan_timer_active"
@@ -29,32 +31,60 @@
 #define HVAC_MODE @"hvac_mode"
 #define NAME_LONG @"name_long"
 #define THERMOSTAT_PATH @"devices/thermostats"
+#define POLL_INTERVAL 30.0f
 
 @implementation NestThermostatManager
 
 /**
- * Sets up a new connection for the thermostat provided
- * and observes for any change in /devices/thermostats/thermostatId.
- * @param thermostat The thermostat you want to watch changes for.
+ * Set up the polling timer.
+ * @param thermostat The thermostat you wish to poll for. The currently selected thermostat
+    if more than one exist in a structure.
  */
-- (void)beginSubscriptionForThermostat:(Thermostat *)thermostat
+- (void)setupPollTimer:(Thermostat *)thermostat
+{
+    [self invalidatePollTimer];
+    
+    // Enable the timer on the main thread and pass the thermostat
+    //   as a parameter (userInfo)
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.pollTimer = [NSTimer scheduledTimerWithTimeInterval:POLL_INTERVAL
+                                                          target:self
+                                                        selector:@selector(pollThermostat:)
+                                                        userInfo:thermostat
+                                                         repeats:YES];
+    });
+}
+
+/**
+ * Callback from the poll timer, gets the current state of the thermostat.
+ * @param theTimer The poll NSTimer object.
+ */
+- (void)pollThermostat:(NSTimer*)theTimer
+{
+    [self getStateForThermostat:[theTimer userInfo]];
+}
+
+/**
+ * Gets the current state of a thermostat and updates the display.
+ * @param thermostat The thermostat being checked for the current state.
+ */
+- (void)getStateForThermostat:(Thermostat *)thermostat
 {
     
     [[RESTManager sharedManager] getData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId] success:^(NSDictionary *responseJSON) {
         
-        NSLog(@"NestThermostatManager Success: %@", responseJSON);
         [self updateThermostat:thermostat forStructure:responseJSON];
+        [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
         
     } redirect:^(NSHTTPURLResponse *responseURL) {
         
         // If a redirect was thrown, make another call using the redirect URL
-        NSLog(@"NestThermostatManager Redirect: %@", [responseURL URL]);
         self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
         
         [[RESTManager sharedManager] getDataRedirect:self.redirectURL success:^(NSDictionary *responseJSON) {
             
             [self updateThermostat:thermostat forStructure:responseJSON];
-            NSLog(@"NestThermostatManager Redirect Success: %@", responseJSON);
+            [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
             
         } failure:^(NSError *error) {
             NSLog(@"NestThermostatManager Redirect Error: %@", error);
@@ -62,9 +92,9 @@
         
     } failure:^(NSError *error) {
         NSLog(@"NestThermostatManager Error: %@", error);
+        
     }];
     
-    NSLog(@"NestThermostatManager - after REST");
 }
 
 /**
@@ -110,34 +140,45 @@
     NSMutableDictionary *values = [[NSMutableDictionary alloc] init];
     
     [values setValue:[NSNumber numberWithInteger:thermostat.targetTemperatureF] forKey:TARGET_TEMPERATURE_F];
-    [values setValue:[NSNumber numberWithBool:thermostat.fanTimerActive] forKey:FAN_TIMER_ACTIVE];
     
-    NSLog(@"NestThermostatManager write");
+    //Check if the thermostat has a fan before setting the fanTimerActive value
+    if (thermostat.hasFan) {
+        [values setValue:[NSNumber numberWithBool:thermostat.fanTimerActive] forKey:FAN_TIMER_ACTIVE];
+    }
     
     [[RESTManager sharedManager] setData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId] withValues:values success:^(NSDictionary *responseJSON) {
-        NSLog(@"NestThermostatManager Success: %@", responseJSON);
+        
+        [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
         
     } redirect:^(NSHTTPURLResponse *responseURL) {
         
         // If a redirect was thrown, make another call using the redirect URL
-        NSLog(@"NestStructureManager Redirect: %@", [responseURL URL]);
         self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
         
         [[RESTManager sharedManager] setDataRedirect:self.redirectURL withValues:values success:^(NSDictionary *responseJSON) {
             
-            NSLog(@"NestThermostatManager Redirect Success: %@", responseJSON);
+            [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
             
         } failure:^(NSError *error) {
             NSLog(@"NestThermostatManager Redirect Error: %@", error);
         }];
         
     } failure:^(NSError *error) {
-        NSLog(@"NestThermostatManager Error: %@", error);
+        NSLog(@"NestThermostatManager Error");
     }];
-
 
 }
 
 
+/**
+ * Invalidate (turn off) the read polling timer
+ */
+- (void)invalidatePollTimer
+{
+    if ([self.pollTimer isValid]) {
+        [self.pollTimer invalidate];
+        self.pollTimer = nil;
+    }
+}
 
 @end

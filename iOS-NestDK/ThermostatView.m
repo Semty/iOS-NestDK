@@ -458,6 +458,7 @@
  */
 - (void)updateWithThermostat:(Thermostat *)thermostat
 {
+    
     // Set the current thermostat
     self.currentThermostat = thermostat;
     
@@ -486,6 +487,12 @@
         [self.fanSwitch setEnabled:NO];
         [self.fanSuffix setText:FAN_TIMER_SUFFIX_DISABLED];
     }
+    
+    // ensure the UIView is refresh immediately
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setNeedsDisplay];
+    });
+
 }
 
 /**

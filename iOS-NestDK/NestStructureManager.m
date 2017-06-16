@@ -28,23 +28,18 @@
 - (void)initialize
 {
 
-    NSLog(@"NestStructureManager - between FB and REST");
-
     [[RESTManager sharedManager] getData:@"structures" success:^(NSDictionary *responseJSON) {
         
-        NSLog(@"NestStructureManager Success: %@", responseJSON);
         [self parseStructure:responseJSON];
      
         } redirect:^(NSHTTPURLResponse *responseURL) {
             
             // If a redirect was thrown, make another call using the redirect URL
-            NSLog(@"NestStructureManager Redirect: %@", [responseURL URL]);
             self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
             
             [[RESTManager sharedManager] getDataRedirect:self.redirectURL success:^(NSDictionary *responseJSON) {
                 
                 [self parseStructure:responseJSON];
-                NSLog(@"NestStructureManager Redirect Success: %@", responseJSON);
                 
             } failure:^(NSError *error) {
                 NSLog(@"NestStructureManager Redirect Error: %@", error);
@@ -53,8 +48,6 @@
         } failure:^(NSError *error) {
             NSLog(@"NestStructureManager Error: %@", error);
         }];
-    
-    NSLog(@"NestStructureManager - after REST");
 
 }
 
@@ -73,6 +66,7 @@
     }
     
     [self.delegate structureUpdated:returnStructure];
+    
 }
 
 /**

@@ -36,6 +36,7 @@
 @property (nonatomic, strong) NSDictionary *currentStructure;
 
 @property (nonatomic, strong) UILabel *statusLabel;
+@property (nonatomic, strong) UILabel *errorLabel;
 
 @end
 
@@ -56,10 +57,13 @@
     
     // Add the tap to switch label
     [self addTapToSwitchLabel];
+    
+    // Add the error view
+    [self setupErrorView];
 }
 
 /**
- * Adds the tap to switch label.
+ * Sets up the tap to switch label.
  */
 - (void)addTapToSwitchLabel
 {
@@ -99,12 +103,12 @@
  */
 - (void)setupErrorView
 {
-    self.statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 255, 300, 25)];
-    [self.statusLabel setText:@""];
-    [self.statusLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.statusLabel setTextColor:[UIColor nestBlue]];
-    [self.statusLabel setFont:[UIFont fontWithName:@"HelveticaNeue" size:22.f]];
-    [self.scrollView addSubview:self.statusLabel];
+    self.errorLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 300, 300, 100)];
+    [self.errorLabel setText:@""];
+    [self.errorLabel setFont:[UIFont fontWithName:@"HelveticaNeue" size:14.f]];
+    [self.errorLabel setNumberOfLines:0];
+    [self.errorLabel setLineBreakMode:NSLineBreakByWordWrapping];
+    [self.scrollView addSubview:self.errorLabel];
 }
 
 #pragma mark - View Controller Life Cycle
@@ -125,6 +129,7 @@
     [self.nestStructureManager setDelegate:self];
     [self.nestStructureManager initialize];
     
+    // Get the initial thermostat
     self.nestThermostatManager = [[NestThermostatManager alloc] init];
     [self.nestThermostatManager setDelegate:self];
     
@@ -202,7 +207,10 @@
         [self.thermostatView showLoading];
 
         // Load information for just the first thermostat
-        [self.nestThermostatManager beginSubscriptionForThermostat:thermostat];
+        [self.nestThermostatManager getStateForThermostat:thermostat];
+        
+        // Create the timer for READ polling
+        [self.nestThermostatManager setupPollTimer:thermostat];
         
     }
     
@@ -225,6 +233,17 @@
 
 }
 
+/**
+ * Display the error in the app
+ * @param error The error returned by the Nest API, nil if no error
+ */
+- (void)errorDisplay:(NSError *)error
+{
+    if (error)
+        [self.errorLabel setText:[NSString stringWithFormat:@"Error! %@", error]];
+    else
+        [self.errorLabel setText:nil];
+}
 
 
 @end

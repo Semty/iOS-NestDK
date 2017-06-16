@@ -100,13 +100,9 @@
  */
 - (void)presentWebViewWithURL:(NSString *)url
 {
-    NSLog(@"presentWebViewWithURL start");
-    
     // Present modally the web view controller
     self.nestWebViewAuthController = [[NestWebViewAuthController alloc] initWithURL:url delegate:self];
     [self presentViewController:self.nestWebViewAuthController animated:YES completion:^{}];
-    
-    NSLog(@"presentWebViewWithURL end");
 }
 
 /**
@@ -144,9 +140,6 @@
  */
 - (void)foundAuthorizationCode:(NSString *)authorizationCode
 {
-    
-    NSLog(@"foundAuthorizationCode start");
-    
     [self.nestWebViewAuthController dismissViewControllerAnimated:YES completion:^{}];
     
     // Save the authorization code
@@ -158,8 +151,6 @@
     // Set the button to disabled
     [self.nestConnectButton setEnabled:NO];
     [self.nestConnectButton setTitle:@"Loading..." forState:UIControlStateNormal];
-    
-    NSLog(@"foundAuthorizationCode end");
 }
 
 /**
@@ -174,7 +165,7 @@
 #pragma mark - Private Methods
 
 /**
- * Invalidate the check token timer
+ * Invalidate (turn off) the check token timer
  */
 - (void)invalidateTimer
 {
