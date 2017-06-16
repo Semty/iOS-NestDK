@@ -28,7 +28,8 @@
 - (void)initialize
 {
 
-    [[RESTManager sharedManager] getData:@"structures" success:^(NSDictionary *responseJSON) {
+    [[RESTManager sharedManager] getData:@"structures"
+                                 success:^(NSDictionary *responseJSON) {
         
         [self parseStructure:responseJSON];
      
@@ -37,7 +38,8 @@
             // If a redirect was thrown, make another call using the redirect URL
             self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
             
-            [[RESTManager sharedManager] getDataRedirect:self.redirectURL success:^(NSDictionary *responseJSON) {
+            [[RESTManager sharedManager] getDataRedirect:self.redirectURL
+                                                 success:^(NSDictionary *responseJSON) {
                 
                 [self parseStructure:responseJSON];
                 

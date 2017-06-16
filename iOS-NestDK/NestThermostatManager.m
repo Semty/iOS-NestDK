@@ -71,7 +71,8 @@
 - (void)getStateForThermostat:(Thermostat *)thermostat
 {
     
-    [[RESTManager sharedManager] getData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId] success:^(NSDictionary *responseJSON) {
+    [[RESTManager sharedManager] getData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId]
+                                 success:^(NSDictionary *responseJSON) {
         
         [self updateThermostat:thermostat forStructure:responseJSON];
         [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
@@ -81,7 +82,8 @@
         // If a redirect was thrown, make another call using the redirect URL
         self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
         
-        [[RESTManager sharedManager] getDataRedirect:self.redirectURL success:^(NSDictionary *responseJSON) {
+        [[RESTManager sharedManager] getDataRedirect:self.redirectURL
+                                             success:^(NSDictionary *responseJSON) {
             
             [self updateThermostat:thermostat forStructure:responseJSON];
             [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
@@ -143,10 +145,21 @@
     
     //Check if the thermostat has a fan before setting the fanTimerActive value
     if (thermostat.hasFan) {
-        [values setValue:[NSNumber numberWithBool:thermostat.fanTimerActive] forKey:FAN_TIMER_ACTIVE];
+        //[values setValue:[NSNumber numberWithBool:thermostat.fanTimerActive] forKey:FAN_TIMER_ACTIVE];
+        
+        NSNumber *fanTimerActiveBool;
+        if (thermostat.fanTimerActive)
+            fanTimerActiveBool = @YES;
+        else
+            fanTimerActiveBool = @false;
+        
+        [values setValue:fanTimerActiveBool forKey:FAN_TIMER_ACTIVE];
+        NSLog(@"fanTimerActive %@", thermostat.fanTimerActive ? @"TRUE" : @"FALSE");
     }
     
-    [[RESTManager sharedManager] setData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId] withValues:values success:^(NSDictionary *responseJSON) {
+    [[RESTManager sharedManager] setData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId]
+                              withValues:values
+                                 success:^(NSDictionary *responseJSON) {
         
         [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
         
@@ -155,7 +168,9 @@
         // If a redirect was thrown, make another call using the redirect URL
         self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
         
-        [[RESTManager sharedManager] setDataRedirect:self.redirectURL withValues:values success:^(NSDictionary *responseJSON) {
+        [[RESTManager sharedManager] setDataRedirect:self.redirectURL
+                                          withValues:values
+                                             success:^(NSDictionary *responseJSON) {
             
             [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
             
@@ -164,7 +179,7 @@
         }];
         
     } failure:^(NSError *error) {
-        NSLog(@"NestThermostatManager Error");
+        NSLog(@"NestThermostatManager Error: %@", error);
     }];
 
 }

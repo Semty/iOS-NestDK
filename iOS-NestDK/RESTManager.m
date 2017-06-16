@@ -76,7 +76,9 @@
  * @param endpoint The Nest API endpoint to call.
  * @param data The key-value pairs to write to the Nest API for PUT calls, nil if a GET call
  */
-- (NSMutableURLRequest *)createRequest:(NSString *)type forEndpoint:(NSString *)endpoint withData:(NSData *)data
+- (NSMutableURLRequest *)createRequest:(NSString *)type
+                           forEndpoint:(NSString *)endpoint
+                              withData:(NSData *)data
 {
 
     NSString *authBearer = [NSString stringWithFormat:@"Bearer %@",
@@ -104,14 +106,22 @@
  * @param redirect Block to call after a redirect response.
  * @param failure Block to call after a failure response.
  */
-- (void)getData:(NSString *)endpoint success:(void (^)(NSDictionary *response))success redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect failure:(void(^)(NSError* error))failure {
+- (void)getData:(NSString *)endpoint
+        success:(void (^)(NSDictionary *response))success
+       redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
+        failure:(void(^)(NSError* error))failure {
     
     // Build the HTTP request
     NSString *targetURL = [NSString stringWithFormat:@"%@/%@", NestAPIEndpoint, endpoint];
-    NSMutableURLRequest *request = [self createRequest:@"GET" forEndpoint:targetURL withData:nil];
+    
+    NSMutableURLRequest *request = [self createRequest:@"GET"
+                                           forEndpoint:targetURL
+                                              withData:nil];
     
     // Assign the session to the main queue so the call happens immediately
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:nil
+                                                     delegateQueue:[NSOperationQueue mainQueue]];
     
     [[session dataTaskWithRequest:request completionHandler:
       ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -127,7 +137,9 @@
           else if (error)
               failure(error);
           else {
-              NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+              NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data
+                                                                          options:kNilOptions
+                                                                            error:nil];
               success(requestJSON);
           }
 
@@ -141,16 +153,22 @@
  * @param success Block to call after a successful response.
  * @param failure Block to call after a failure response.
  */
-- (void)getDataRedirect:(NSString *)endpoint success:(void (^)(NSDictionary *response))success failure:(void(^)(NSError* error))failure {
+- (void)getDataRedirect:(NSString *)endpoint
+                success:(void (^)(NSDictionary *response))success
+                failure:(void(^)(NSError* error))failure {
     
     // Build the HTTP request
-    NSMutableURLRequest *request = [self createRequest:@"GET" forEndpoint:endpoint withData:nil];
+    NSMutableURLRequest *request = [self createRequest:@"GET"
+                                           forEndpoint:endpoint
+                                              withData:nil];
     
     // Assign the session to the main queue so the call happens immediately
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:nil
+                                                     delegateQueue:[NSOperationQueue mainQueue]];
     
-    [[session dataTaskWithRequest:request completionHandler:
-      ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    [[session dataTaskWithRequest:request
+                completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
           
           NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
           NSLog(@"RESTManager Redirect Response Status Code: %ld", (long)[httpResponse statusCode]);
@@ -158,7 +176,9 @@
           if (error)
               failure(error);
           else {
-              NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+              NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data
+                                                                          options:kNilOptions
+                                                                            error:nil];
               success(requestJSON);
           }
           
@@ -174,18 +194,30 @@
  * @param redirect Block to call after a redirect response.
  * @param failure Block to call after a failure response.
  */
-- (void)setData:(NSString *)endpoint withValues:(NSDictionary *)values success:(void (^)(NSDictionary *response))success redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect failure:(void(^)(NSError* error))failure {
+- (void)setData:(NSString *)endpoint
+     withValues:(NSDictionary *)values
+        success:(void (^)(NSDictionary *response))success
+       redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
+        failure:(void(^)(NSError* error))failure {
     
     // Build the HTTP request
     NSString *targetURL = [NSString stringWithFormat:@"%@/%@", NestAPIEndpoint, endpoint];
-    NSData *postData = [NSJSONSerialization dataWithJSONObject:values options:kNilOptions error:nil];
-    NSMutableURLRequest *request = [self createRequest:@"PUT" forEndpoint:targetURL withData:postData];
+    
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:values
+                                                       options:kNilOptions
+                                                         error:nil];
+    
+    NSMutableURLRequest *request = [self createRequest:@"PUT"
+                                           forEndpoint:targetURL
+                                              withData:postData];
     
     // Assign the session to the main queue so the call happens immediately
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:nil
+                                                     delegateQueue:[NSOperationQueue mainQueue]];
     
-    [[session dataTaskWithRequest:request completionHandler:
-      ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    [[session dataTaskWithRequest:request
+                completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
           
           NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
           NSLog(@"RESTManager Response Status Code: %ld", (long)[httpResponse statusCode]);
@@ -197,7 +229,9 @@
           else if (error)
               failure(error);
           else {
-              NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+              NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data
+                                                                          options:kNilOptions
+                                                                            error:nil];
               success(requestJSON);
           }
           
@@ -212,17 +246,27 @@
  * @param success Block to call after a successful response.
  * @param failure Block to call after a failure response.
  */
-- (void)setDataRedirect:(NSString *)endpoint withValues:(NSDictionary *)values success:(void (^)(NSDictionary *response))success failure:(void(^)(NSError* error))failure {
+- (void)setDataRedirect:(NSString *)endpoint
+             withValues:(NSDictionary *)values
+                success:(void (^)(NSDictionary *response))success
+                failure:(void(^)(NSError* error))failure {
 
     // Build the HTTP request
-    NSData *postData = [NSJSONSerialization dataWithJSONObject:values options:kNilOptions error:nil];
-    NSMutableURLRequest *request = [self createRequest:@"PUT" forEndpoint:endpoint withData:postData];
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:values
+                                                       options:kNilOptions
+                                                         error:nil];
+
+    NSMutableURLRequest *request = [self createRequest:@"PUT"
+                                           forEndpoint:endpoint
+                                              withData:postData];
     
     // Assign the session to the main queue so the call happens immediately
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:nil
+                                                     delegateQueue:[NSOperationQueue mainQueue]];
     
-    [[session dataTaskWithRequest:request completionHandler:
-      ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    [[session dataTaskWithRequest:request
+                completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
           
           NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
           NSLog(@"RESTManager Redirect Response Status Code set: %ld", (long)[httpResponse statusCode]);
@@ -230,7 +274,9 @@
           if (error)
               failure(error);
           else {
-              NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+              NSDictionary *requestJSON = [NSJSONSerialization JSONObjectWithData:data
+                                                                          options:kNilOptions
+                                                                            error:nil];
               success(requestJSON);
           }
           

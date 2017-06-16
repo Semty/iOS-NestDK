@@ -181,7 +181,11 @@
 - (void)setupcheckTokenTimer
 {
     [self invalidateTimer];
-    self.checkTokenTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(checkForAccessToken:) userInfo:nil repeats:YES];
+    self.checkTokenTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f
+                                                            target:self
+                                                          selector:@selector(checkForAccessToken:)
+                                                          userInfo:nil
+                                                           repeats:YES];
 }
 
 @end

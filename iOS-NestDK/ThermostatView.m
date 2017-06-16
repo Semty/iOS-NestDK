@@ -441,6 +441,7 @@
 {
     [self.currentThermostat setFanTimerActive:sender.isOn];
     [self saveThermostatChange];
+    [self updateFanLabel:sender.isOn];
 }
 
 /**
@@ -450,6 +451,19 @@
 - (void)turnFan:(BOOL)on
 {
     [self.fanSwitch setOn:on];
+    [self updateFanLabel:on];
+}
+
+/**
+ * Update the fan label based on value of switch
+ */
+- (void)updateFanLabel:(BOOL)on
+{
+    if (on) {
+        [self.fanSuffix setText:FAN_TIMER_SUFFIX_ON];
+    } else {
+        [self.fanSuffix setText:FAN_TIMER_SUFFIX_OFF];
+    }
 }
 
 /**
@@ -477,12 +491,7 @@
     if (thermostat.hasFan) {
         [self.fanSwitch setEnabled:YES];
         [self turnFan:thermostat.fanTimerActive];
-
-        if (thermostat.fanTimerActive) {
-            [self.fanSuffix setText:FAN_TIMER_SUFFIX_ON];
-        } else {
-            [self.fanSuffix setText:FAN_TIMER_SUFFIX_OFF];
-        }
+        [self updateFanLabel:thermostat.fanTimerActive];
     } else {
         [self.fanSwitch setEnabled:NO];
         [self.fanSuffix setText:FAN_TIMER_SUFFIX_DISABLED];

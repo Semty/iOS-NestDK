@@ -210,7 +210,9 @@
     // The request is complete and data has been received
     // You can parse the stuff in your instance variable now
     NSError* error;
-    NSDictionary* json = [NSJSONSerialization JSONObjectWithData:self.responseData options:kNilOptions error:&error];
+    NSDictionary* json = [NSJSONSerialization JSONObjectWithData:self.responseData
+                                                         options:kNilOptions
+                                                           error:&error];
     
     // Store the access key
     long expiresIn = [[json objectForKey:@"expires_in"] longValue];

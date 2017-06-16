@@ -118,8 +118,8 @@
 /**
  * Intercept the requests to get the authorization code before the webView loads
  * 
- * Ideally, the redirect URI contains a server-side script to obtain the access token, 
- *   to keep it from being exposed client-side.
+ * Ideally, the redirect URI contains a server-side script that obtains the access token,
+ *   to keep user credentials and the token from being exposed client-side.
  */
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
