@@ -15,12 +15,15 @@ The app provides the following functionality:
 
 > This app does not update state changes from the Nest API in real-time. It polls the API every 30 seconds and only updates the app after a successful polling call.
 
-## Create a developer account / client
+## Create a developer account / product
 
 You need a Nest Developer account to run this app.
 
 1. Create a developer account at [https://developer.nest.com](https://developer.nest.com)
-1. Register a new client and specify its Redirect URI as `http://localhost:8080/auth/nest/callback`
+1. Register a new product and specify its Redirect URI as `http://localhost:8080/auth/nest/callback`
+1. Select the Thermostat read/write v6 permission for the product.
+
+See [Register a Product](https://developers.nest.com/documentation/cloud/register-client) for more information.
 
 ## Create a user account
 
@@ -35,11 +38,11 @@ Create a user account at [https://home.nest.com](https://home.nest.com)
 
 ## Configure the app
 
-Open the project file (`iOS-NestDK.xcodeproj`) in Xcode.
+1. Clone this repository: `git clone https://github.com/nestlabs/iOS-NestDK.git`
+1. Open the project file (`iOS-NestDK.xcodeproj`) in Xcode.
+1. In `Constants.m`, replace the placeholder strings for `NestClientID` and `NestClientSecret` with your Nest Developer credentials. See the Overview tab on the products page: [https://console.developers.nest.com/products](https://console.developers.nest.com/products).
 
-In `Constants.m`, replace the placeholder strings for `NestClientID` and `NestClientSecret` with your Nest Developer credentials. See the Overview tab on the products page: [https://console.developers.nest.com/products](https://console.developers.nest.com/products).
-
-To change the GET polling frequency, modify the `POLL_INTERVAL` value in `NestThermostatManager.m`. Do not set the `POLL_INTERVAL` to less than 20 seconds, or you may hit the GET request rate limit.
+> To change the GET polling frequency, modify the `POLL_INTERVAL` value in `NestThermostatManager.m`. Do not set the `POLL_INTERVAL` to less than 21 seconds, or you may hit the GET request rate limit.
 
 ## Build and run the app
 

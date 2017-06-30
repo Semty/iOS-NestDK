@@ -17,7 +17,6 @@
 		AF26D6141952606C00450E99 /* NestStructureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = AF26D6131952606C00450E99 /* NestStructureManager.m */; };
 		AF7BD6BE195DEFB500296A8C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = AF7BD6BD195DEFB500296A8C /* Constants.m */; };
 		AF95AB381953281A006FD4A4 /* Thermostat.m in Sources */ = {isa = PBXBuildFile; fileRef = AF95AB371953281A006FD4A4 /* Thermostat.m */; };
-		AFCD57A619621A1B001DD6B6 /* Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFCD57A519621A1B001DD6B6 /* Firebase.framework */; };
 		AFE7212E1950E7EF0082270D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE7212D1950E7EF0082270D /* Foundation.framework */; };
 		AFE721301950E7EF0082270D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE7212F1950E7EF0082270D /* CoreGraphics.framework */; };
 		AFE721321950E7EF0082270D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFE721311950E7EF0082270D /* UIKit.framework */; };
@@ -69,7 +68,6 @@
 		AF7BD6BD195DEFB500296A8C /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		AF95AB361953281A006FD4A4 /* Thermostat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Thermostat.h; sourceTree = "<group>"; };
 		AF95AB371953281A006FD4A4 /* Thermostat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Thermostat.m; sourceTree = "<group>"; };
-		AFCD57A519621A1B001DD6B6 /* Firebase.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Firebase.framework; path = third_party/Firebase.framework; sourceTree = "<group>"; };
 		AFE7212A1950E7EF0082270D /* iOS-NestDK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS-NestDK.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFE7212D1950E7EF0082270D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AFE7212F1950E7EF0082270D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -113,7 +111,6 @@
 				AFE721701950ED8B0082270D /* libc++.1.tbd in Frameworks */,
 				AFE7216C1950ED810082270D /* CFNetwork.framework in Frameworks */,
 				AFE7216A1950ED7D0082270D /* Security.framework in Frameworks */,
-				AFCD57A619621A1B001DD6B6 /* Firebase.framework in Frameworks */,
 				AFE721681950ED790082270D /* QuartzCore.framework in Frameworks */,
 				AFE721301950E7EF0082270D /* CoreGraphics.framework in Frameworks */,
 				AFE721321950E7EF0082270D /* UIKit.framework in Frameworks */,
@@ -169,7 +166,6 @@
 				8AE9C7561ED8CA9E00DD3526 /* libicucore.tbd */,
 				AFE721731950F2620082270D /* SystemConfiguration.framework */,
 				AFE7216F1950ED8B0082270D /* libc++.1.tbd */,
-				AFCD57A519621A1B001DD6B6 /* Firebase.framework */,
 				AFE7216B1950ED810082270D /* CFNetwork.framework */,
 				AFE721691950ED7D0082270D /* Security.framework */,
 				AFE721671950ED790082270D /* QuartzCore.framework */,
