@@ -18,13 +18,10 @@
 
 
 // Replace this with your Nest Client ID; see https://console.developers.nest.com/products
-//NSString * const NestClientID = @"replace-with-your-client-id";
+NSString * const NestClientID = @"replace-with-your-client-id";
 
 // Replace this with your Nest Client Secret; see https://console.developers.nest.com/products
-//NSString * const NestClientSecret = @"replace-with-your-client-secret";
-
-NSString * const NestClientID = @"c4de63cb-3838-4f25-9b0c-dda15b5649e4";
-NSString * const NestClientSecret = @"xbr0vNYeUzyQ7KIadvbyQACBr";
+NSString * const NestClientSecret = @"replace-with-your-client-secret";
 
 // Change this if you want to use a different Redirect URL
 NSString * const RedirectURL = @"http://localhost:8080/auth/nest/callback";
