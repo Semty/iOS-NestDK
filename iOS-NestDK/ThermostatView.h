@@ -16,10 +16,11 @@
 
 #import <UIKit/UIKit.h>
 #import "Thermostat.h"
+#import "Constants.h"
 
 @protocol ThermostatViewDelegate <NSObject>
 
-- (void)thermostatInfoChange:(Thermostat *)thermostat;
+- (void)thermostatInfoChange:(Thermostat *)thermostat forEndpoint:(NestEndpoint)endpoint;
 - (void)showNextThermostat;
 
 @end
@@ -29,6 +30,7 @@
 @property (nonatomic) NSInteger currentTemp;
 @property (nonatomic) NSInteger targetTemp;
 @property (nonatomic, strong) NSString *hvacMode;
+@property (nonatomic) BOOL fanTimerActive;
 @property (nonatomic, strong) NSString *thermostatId;
 @property (nonatomic, strong) NSString *thermostateName;
 @property (nonatomic, strong) id <ThermostatViewDelegate>delegate;

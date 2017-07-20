@@ -18,7 +18,7 @@
 
 @interface UIColor (Custom)
 
-+ (UIColor *)nestBlue;
-+ (UIColor *)nestBlueSelected;
++ (UIColor *)uiBlue;
++ (UIColor *)uiBlueSelected;
 
 @end

@@ -69,6 +69,7 @@
 @synthesize currentTemp = _currentTemp;
 @synthesize targetTemp = _targetTemp;
 @synthesize hvacMode = _hvacMode;
+@synthesize fanTimerActive = _fanTimerActive;
 
 #pragma mark Setter Methods
 
@@ -100,6 +101,16 @@
 {
     _hvacMode = hvacMode;
     [self updateCurrentModeLabel:hvacMode];
+}
+
+/**
+ * Provide the setter for the fan timer.
+ * @param fanTimerActive The boolean of the fan timer.
+ */
+- (void)setFanTimerActive:(BOOL)fanTimerActive
+{
+    _fanTimerActive = fanTimerActive;
+    [self updateFanLabel:fanTimerActive];
 }
 
 #pragma mark View Setup
@@ -174,7 +185,7 @@
 {
     UIButton *thermostatButton = [[UIButton alloc] initWithFrame:CGRectMake(DEFAULT_PADDING, DEFAULT_PADDING, 280, 25)];
     [thermostatButton setTitle:TITLE_PLACEHOLDER forState:UIControlStateNormal];
-    [thermostatButton setTitleColor:[UIColor nestBlue] forState:UIControlStateNormal];
+    [thermostatButton setTitleColor:[UIColor uiBlue] forState:UIControlStateNormal];
     thermostatButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [thermostatButton.titleLabel setFont:[UIFont fontWithName:BOLD_FONT size:TITLE_FONT_SIZE]];
     [thermostatButton addTarget:self action:@selector(thermostatNameButtonHit:) forControlEvents:UIControlEventTouchUpInside];
@@ -254,7 +265,7 @@
 {
     UISwitch *fanSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(DEFAULT_PADDING, FAN_Y_LEVEL, 79, 50)];
     [fanSwitch addTarget:self action:@selector(fanDidSwitch:) forControlEvents:UIControlEventValueChanged];
-    [fanSwitch setOnTintColor:[UIColor nestBlue]];
+    [fanSwitch setOnTintColor:[UIColor uiBlue]];
     [self addSubview:fanSwitch];
     return fanSwitch;
 }
@@ -266,7 +277,7 @@
 - (void)setupTempSlider
 {
     self.tempSlider = [[UISlider alloc] initWithFrame:CGRectMake(self.frame.size.width/2 + DEFAULT_PADDING, TARGET_Y_LEVEL, self.frame.size.width/2 - (DEFAULT_PADDING * 2), TEMP_HEIGHT)];
-    [self.tempSlider setTintColor:[UIColor nestBlue]];
+    [self.tempSlider setTintColor:[UIColor uiBlue]];
     [self.tempSlider addTarget:self action:@selector(sliderValueChanged:) forControlEvents:UIControlEventValueChanged];
     [self.tempSlider addTarget:self action:@selector(sliderMoving:) forControlEvents:UIControlEventTouchDown];
     [self.tempSlider addTarget:self action:@selector(sliderValueSettled:) forControlEvents:UIControlEventTouchUpInside];
@@ -320,6 +331,19 @@
     
     [self.currentModeLabel setFrame:CGRectMake(DEFAULT_PADDING, MODE_Y_LEVEL, textSize.width, SUFFIX_HEIGHT)];
     [self.currentModeLabel setText:newString];
+}
+
+/**
+ * Update the fan label based on value of switch
+ * @param on The value of the switch
+ */
+- (void)updateFanLabel:(BOOL)on
+{
+    if (on) {
+        [self.fanSuffix setText:FAN_TIMER_SUFFIX_ON];
+    } else {
+        [self.fanSuffix setText:FAN_TIMER_SUFFIX_OFF];
+    }
 }
 
 #pragma mark Thermostat Interaction Methods
@@ -403,7 +427,7 @@
     self.isSlidingSlider = NO;
     
     [self.currentThermostat setTargetTemperatureF:[self tempSliderActualValue]];
-    [self saveThermostatChange];
+    [self saveThermostatChange:neTARGET_TEMPERATURE_F];
 }
 
 /**
@@ -440,7 +464,7 @@
 - (void)fanDidSwitch:(UISwitch *)sender
 {
     [self.currentThermostat setFanTimerActive:sender.isOn];
-    [self saveThermostatChange];
+    [self saveThermostatChange:neFAN_TIMER_ACTIVE];
     [self updateFanLabel:sender.isOn];
 }
 
@@ -452,18 +476,9 @@
 {
     [self.fanSwitch setOn:on];
     [self updateFanLabel:on];
-}
-
-/**
- * Update the fan label based on value of switch
- */
-- (void)updateFanLabel:(BOOL)on
-{
-    if (on) {
-        [self.fanSuffix setText:FAN_TIMER_SUFFIX_ON];
-    } else {
-        [self.fanSuffix setText:FAN_TIMER_SUFFIX_OFF];
-    }
+    
+    // Update the local state of the current thermostat
+    [self.currentThermostat setFanTimerActive:on];
 }
 
 /**
@@ -516,9 +531,9 @@
 /*
  * Thermostat was updated, save the change ONLINE!!!.
  */
-- (void)saveThermostatChange
+- (void)saveThermostatChange:(NestEndpoint)endpoint
 {
-    [self.delegate thermostatInfoChange:self.currentThermostat];
+    [self.delegate thermostatInfoChange:self.currentThermostat forEndpoint:endpoint];
 }
 
 @end

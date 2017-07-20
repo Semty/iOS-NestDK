@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-@interface RESTManager : NSObject <NSURLConnectionDelegate>
+@interface RESTManager : NSObject <NSURLSessionDelegate>
 
 + (RESTManager *)sharedManager;
 
@@ -25,20 +25,21 @@
 - (void)getData:(NSString *)endpoint
         success:(void (^)(NSDictionary *response))success
        redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
-        failure:(void(^)(NSError* error))failure;
+        failure:(void (^)(NSError* error))failure;
 
 - (void)getDataRedirect:(NSString *)endpoint
                 success:(void (^)(NSDictionary *response))success
-                failure:(void(^)(NSError* error))failure;
+                failure:(void (^)(NSError* error))failure;
 
 - (void)setData:(NSString *)endpoint
-     withValues:(NSDictionary *)values
+     withValues:(NSData *)putData
         success:(void (^)(NSDictionary *response))success
-        redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
-        failure:(void(^)(NSError* error))failure;
+       redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
+        failure:(void (^)(NSError* error))failure;
 
-- (void)setDataRedirect:(NSString *)endpoint withValues:(NSDictionary *)values
+- (void)setDataRedirect:(NSString *)endpoint
+             withValues:(NSData *)putData
                 success:(void (^)(NSDictionary *response))success
-                failure:(void(^)(NSError* error))failure;
+                failure:(void (^)(NSError* error))failure;
 
 @end

@@ -24,4 +24,9 @@ extern NSString * const NestState;
 extern NSString * const RedirectURL;
 extern NSString * const NestAPIEndpoint;
 
+typedef enum {
+    neFAN_TIMER_ACTIVE,
+    neTARGET_TEMPERATURE_F
+} NestEndpoint;
+
 #endif

@@ -15,7 +15,6 @@
  */
 
 #import "NestThermostatManager.h"
-#import "NestAuthManager.h"
 #import "RESTManager.h"
 
 @interface NestThermostatManager ()
@@ -134,31 +133,46 @@
 }
 
 /**
- * Sets the thermostat values by using the Nest API.
- * @param thermostat The thermostat you wish to save.\
+ * Sets thermostat values via the Nest API.
+ * @param thermostat The thermostat you wish to update.
+ * @param endpoint The endpoint you wish to update.
  */
-- (void)saveChangesForThermostat:(Thermostat *)thermostat
+- (void)saveChangesForThermostat:(Thermostat *)thermostat forEndpoint:(NestEndpoint)endpoint
 {
-    NSMutableDictionary *values = [[NSMutableDictionary alloc] init];
     
-    [values setValue:[NSNumber numberWithInteger:thermostat.targetTemperatureF] forKey:TARGET_TEMPERATURE_F];
+    NSData *jsonString;
+    NSNumber *temperature;
     
-    //Check if the thermostat has a fan before setting the fanTimerActive value
-    if (thermostat.hasFan) {
-        //[values setValue:[NSNumber numberWithBool:thermostat.fanTimerActive] forKey:FAN_TIMER_ACTIVE];
-        
-        NSNumber *fanTimerActiveBool;
-        if (thermostat.fanTimerActive)
-            fanTimerActiveBool = @YES;
-        else
-            fanTimerActiveBool = @false;
-        
-        [values setValue:fanTimerActiveBool forKey:FAN_TIMER_ACTIVE];
-        NSLog(@"fanTimerActive %@", thermostat.fanTimerActive ? @"TRUE" : @"FALSE");
+    // Build the JSON request based on the field that was changed
+    switch(endpoint)
+    {
+        case neFAN_TIMER_ACTIVE:
+            if (thermostat.hasFan) {
+                if (thermostat.fanTimerActive) {
+                    jsonString = [NSJSONSerialization dataWithJSONObject:@{ FAN_TIMER_ACTIVE : @YES }
+                                                                 options:kNilOptions
+                                                                   error:nil];
+                }
+                else {
+                    jsonString = [NSJSONSerialization dataWithJSONObject:@{ FAN_TIMER_ACTIVE : @NO }
+                                                                 options:kNilOptions
+                                                                   error:nil];
+                }
+            }
+            break;
+        case neTARGET_TEMPERATURE_F:
+            temperature = [NSNumber numberWithInteger:thermostat.targetTemperatureF];
+            jsonString = [NSJSONSerialization dataWithJSONObject:@{ TARGET_TEMPERATURE_F : temperature }
+                                                         options:kNilOptions
+                                                           error:nil];
+            break;
+        default:
+            break;
     }
     
+    // Make the write call for the specified thermostat
     [[RESTManager sharedManager] setData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId]
-                              withValues:values
+                              withValues:jsonString
                                  success:^(NSDictionary *responseJSON) {
         
         [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
@@ -169,7 +183,7 @@
         self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
         
         [[RESTManager sharedManager] setDataRedirect:self.redirectURL
-                                          withValues:values
+                                          withValues:jsonString
                                              success:^(NSDictionary *responseJSON) {
             
             [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];

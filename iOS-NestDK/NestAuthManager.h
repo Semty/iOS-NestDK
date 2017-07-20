@@ -16,11 +16,18 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NestAuthManager : NSObject <NSURLConnectionDelegate>
+@protocol NestAuthManagerDelegate
+
+@end
+
+@interface NestAuthManager : NSObject <NSURLSessionDelegate>
+
+@property (nonatomic, strong) id <NestAuthManagerDelegate>delegate;
 
 + (NestAuthManager *)sharedManager;
 
 - (NSString *)authorizationURL;
+- (NSString *)deauthorizationURL;
 - (NSString *)accessURL;
 - (NSString *)accessToken;
 
@@ -31,5 +38,7 @@
 
 - (void)setAccessToken:(NSString *)accessToken withExpiration:(long)expiration;
 - (void)setAuthorizationCode:(NSString *)authorizationCode;
+
+- (void)deauthorizeConnection;
 
 @end

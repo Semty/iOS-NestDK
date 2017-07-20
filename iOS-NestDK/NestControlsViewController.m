@@ -14,13 +14,15 @@
  *  limitations under the License.
  */
 
+#import "NestConnectViewController.h"
 #import "NestControlsViewController.h"
 #import "ThermostatView.h"
 #import "NestThermostatManager.h"
 #import "NestStructureManager.h"
+#import "NestAuthManager.h"
 #import "UIColor+Custom.h"
 
-@interface NestControlsViewController () <NestThermostatManagerDelegate, NestStructureManagerDelegate, ThermostatViewDelegate>
+@interface NestControlsViewController () <NestThermostatManagerDelegate, NestStructureManagerDelegate, ThermostatViewDelegate, NestAuthManagerDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 
@@ -32,11 +34,14 @@
 
 @property (nonatomic, strong) NestThermostatManager *nestThermostatManager;
 @property (nonatomic, strong) NestStructureManager *nestStructureManager;
+@property (nonatomic, strong) NestAuthManager *nestAuthManager;
 
 @property (nonatomic, strong) NSDictionary *currentStructure;
 
 @property (nonatomic, strong) UILabel *statusLabel;
 @property (nonatomic, strong) UILabel *errorLabel;
+
+@property (nonatomic, strong) UIButton *deauthButton;
 
 @end
 
@@ -60,6 +65,9 @@
     
     // Add the error view
     [self setupErrorView];
+    
+    // Add the deauth button
+    [self addDeauthButton];
 }
 
 /**
@@ -70,9 +78,10 @@
     self.statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 255, 300, 25)];
     [self.statusLabel setText:@""];
     [self.statusLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.statusLabel setTextColor:[UIColor nestBlue]];
+    [self.statusLabel setTextColor:[UIColor darkGrayColor]];
     [self.statusLabel setFont:[UIFont fontWithName:@"HelveticaNeue" size:22.f]];
     [self.scrollView addSubview:self.statusLabel];
+    
 }
 
 /**
@@ -103,13 +112,64 @@
  */
 - (void)setupErrorView
 {
-    self.errorLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 300, 300, 100)];
+    self.errorLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 280, 280, 60)];
     [self.errorLabel setText:@""];
-    [self.errorLabel setFont:[UIFont fontWithName:@"HelveticaNeue" size:14.f]];
+    [self.errorLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.errorLabel setTextColor:[UIColor redColor]];
+    [self.errorLabel setFont:[UIFont fontWithName:@"HelveticaNeue" size:12.f]];
     [self.errorLabel setNumberOfLines:0];
     [self.errorLabel setLineBreakMode:NSLineBreakByWordWrapping];
     [self.scrollView addSubview:self.errorLabel];
 }
+
+/**
+ * Sets up the deauthorize button.
+ */
+- (UIButton *)addDeauthButton
+{
+    self.deauthButton = [UIButton buttonWithType:UIButtonTypeSystem];
+                         
+    [self.deauthButton setFrame:CGRectMake(10, 360, 300, 45)];
+    [self.deauthButton setTitle:@"Deauthorize Connection" forState:UIControlStateNormal];
+    [self.deauthButton setTitleColor:[UIColor uiBlue] forState:UIControlStateNormal];
+    [self.deauthButton setTitleColor:[UIColor uiBlueSelected] forState:UIControlStateHighlighted];
+    [self.deauthButton setBackgroundColor:[UIColor colorWithRed:0.97 green:0.97 blue:0.97 alpha:1]];
+
+    [self.deauthButton.layer setBorderColor:[UIColor lightGrayColor].CGColor];
+    [self.deauthButton.layer setCornerRadius:5.f];
+    [self.deauthButton.layer setBorderWidth:1.f];
+    [self.deauthButton.layer setMasksToBounds:YES];
+    
+    [self.deauthButton addTarget:self
+                          action:@selector(deauthorize:)
+                forControlEvents:UIControlEventTouchUpInside];
+    [self.deauthButton setUserInteractionEnabled:YES];
+    
+    [self.scrollView addSubview:self.deauthButton];
+    return self.deauthButton;
+
+}
+
+/**
+ * Deauthorizes the existing Works with Nest connection,
+ *   performs clean up and brings back the Connect view
+ */
+- (void)deauthorize:(UIButton *)sender
+{
+    
+    // Deauthorize the connection and delete saved data
+    [self.nestAuthManager deauthorizeConnection];
+    
+    // Stop the read polling
+    [self.nestThermostatManager invalidatePollTimer];
+    
+    // Remove the current view and bring up the Connect view
+    [self.navigationController popViewControllerAnimated:YES];
+    NestConnectViewController *ncvc = [[NestConnectViewController alloc] init];
+    [self.navigationController setViewControllers:[NSArray arrayWithObject:ncvc] animated:YES];
+    
+}
+
 
 #pragma mark - View Controller Life Cycle
 
@@ -132,6 +192,10 @@
     // Get the initial thermostat
     self.nestThermostatManager = [[NestThermostatManager alloc] init];
     [self.nestThermostatManager setDelegate:self];
+    
+    // Get the auth manager
+    self.nestAuthManager = [[NestAuthManager alloc] init];
+    [self.nestAuthManager setDelegate:self];
     
     [self.thermostatView showLoading];
 }
@@ -171,9 +235,9 @@
  * thermostat info has changed.
  * @param thermostat The updated thermostat object from ThermostatView.
  */
-- (void)thermostatInfoChange:(Thermostat *)thermostat
+- (void)thermostatInfoChange:(Thermostat *)thermostat forEndpoint:(NestEndpoint)endpoint
 {
-    [self.nestThermostatManager saveChangesForThermostat:thermostat];
+    [self.nestThermostatManager saveChangesForThermostat:thermostat forEndpoint:endpoint];
 }
 
 /**
@@ -244,6 +308,5 @@
     else
         [self.errorLabel setText:nil];
 }
-
 
 @end

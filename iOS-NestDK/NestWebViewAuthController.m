@@ -68,7 +68,7 @@
     
     // Add a uiwebview to take up the entire view (beneath the nav bar)
     self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 64, 320, self.view.frame.size.height - 64)];
-    [self.webView setBackgroundColor:[UIColor nestBlue]];
+    [self.webView setBackgroundColor:[UIColor uiBlue]];
     [self.webView setDelegate:self];
     [self.view addSubview:self.webView];
 }
@@ -157,10 +157,9 @@
 
 		return NO;
 	}
-    
-    NSLog(@"Redirect URL doesn't match! Make sure they match between Constants.m and your product page on console.developers.nest.com.");
+
+    return YES;
 	
-	return YES;
 }
 
 

@@ -18,14 +18,14 @@
 
 @implementation UIColor (Custom)
 
-+ (UIColor *)nestBlue
++ (UIColor *)uiBlue
 {
-    return [UIColor colorWithRed:0 green:0.69 blue:0.85 alpha:1];
+    return [UIColor colorWithRed:0 green:0.59 blue:0.85 alpha:1];
 }
 
-+ (UIColor *)nestBlueSelected
++ (UIColor *)uiBlueSelected
 {
-    return [UIColor colorWithRed:0.07 green:0.79 blue:0.99 alpha:1];
+    return [UIColor colorWithRed:0.07 green:0.69 blue:0.99 alpha:1];
 }
 
 @end

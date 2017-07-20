@@ -15,6 +15,7 @@
  */
 
 #import "Thermostat.h"
+#import "Constants.h"
 
 @protocol NestThermostatManagerDelegate <NSObject>
 
@@ -29,7 +30,8 @@
 @property (nonatomic, strong) NSString *redirectURL;
 
 - (void)setupPollTimer:(Thermostat *)thermostat;
+- (void)invalidatePollTimer;
 - (void)getStateForThermostat:(Thermostat *)thermostat;
-- (void)saveChangesForThermostat:(Thermostat *)thermostat;
+- (void)saveChangesForThermostat:(Thermostat *)thermostat forEndpoint:(NestEndpoint)endpoint;
 
 @end

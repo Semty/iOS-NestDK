@@ -84,6 +84,9 @@
     NSString *authBearer = [NSString stringWithFormat:@"Bearer %@",
                             [[NestAuthManager sharedManager] accessToken]];
     
+    // Use this print out the token if you need it
+    //NSLog(@"Token: %@", authBearer);
+    
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     
     [request setHTTPMethod:type];
@@ -109,7 +112,7 @@
 - (void)getData:(NSString *)endpoint
         success:(void (^)(NSDictionary *response))success
        redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
-        failure:(void(^)(NSError* error))failure {
+        failure:(void (^)(NSError* error))failure {
     
     // Build the HTTP request
     NSString *targetURL = [NSString stringWithFormat:@"%@/%@", NestAPIEndpoint, endpoint];
@@ -131,7 +134,19 @@
           
           if ((long)[httpResponse statusCode] == 401 || (long)[httpResponse statusCode] == 307) {
               self.redirectURL = [NSString stringWithFormat:@"%@", [httpResponse URL]];
-              redirect(httpResponse);
+              
+              // Check if a returned 401 is a true 401, sometimes it's a redirect.
+              //   See https://developers.nest.com/documentation/cloud/how-to-handle-redirects
+              //   for more information.
+              NSDictionary *responseHeaders = [httpResponse allHeaderFields];
+              if ([[responseHeaders objectForKey:@"Content-Length"] isEqual: @"0"]) {
+                  // This is a true 401
+                  failure(error);
+              }
+              else {
+                  // It's actually a redirect, so redirect!
+                  redirect(httpResponse);
+              }
               
           }
           else if (error)
@@ -155,7 +170,7 @@
  */
 - (void)getDataRedirect:(NSString *)endpoint
                 success:(void (^)(NSDictionary *response))success
-                failure:(void(^)(NSError* error))failure {
+                failure:(void (^)(NSError* error))failure {
     
     // Build the HTTP request
     NSMutableURLRequest *request = [self createRequest:@"GET"
@@ -195,21 +210,17 @@
  * @param failure Block to call after a failure response.
  */
 - (void)setData:(NSString *)endpoint
-     withValues:(NSDictionary *)values
+     withValues:(NSData *)putData
         success:(void (^)(NSDictionary *response))success
        redirect:(void (^)(NSHTTPURLResponse *responseURL))redirect
-        failure:(void(^)(NSError* error))failure {
+        failure:(void (^)(NSError* error))failure {
     
     // Build the HTTP request
     NSString *targetURL = [NSString stringWithFormat:@"%@/%@", NestAPIEndpoint, endpoint];
     
-    NSData *postData = [NSJSONSerialization dataWithJSONObject:values
-                                                       options:kNilOptions
-                                                         error:nil];
-    
     NSMutableURLRequest *request = [self createRequest:@"PUT"
                                            forEndpoint:targetURL
-                                              withData:postData];
+                                              withData:putData];
     
     // Assign the session to the main queue so the call happens immediately
     NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
@@ -224,7 +235,20 @@
           
           if ((long)[httpResponse statusCode] == 401 || (long)[httpResponse statusCode] == 307) {
               self.redirectURL = [NSString stringWithFormat:@"%@", [httpResponse URL]];
-              redirect(httpResponse);
+              
+              // Check if a returned 401 is a true 401, sometimes it's a redirect.
+              //   See https://developers.nest.com/documentation/cloud/how-to-handle-redirects
+              //   for more information.
+              NSDictionary *responseHeaders = [httpResponse allHeaderFields];
+              if ([[responseHeaders objectForKey:@"Content-Length"] isEqual: @"0"]) {
+                  // This is a true 401
+                  failure(error);
+              }
+              else {
+                  // It's actually a redirect, so redirect!
+                  redirect(httpResponse);
+              }
+
           }
           else if (error)
               failure(error);
@@ -247,18 +271,14 @@
  * @param failure Block to call after a failure response.
  */
 - (void)setDataRedirect:(NSString *)endpoint
-             withValues:(NSDictionary *)values
+             withValues:(NSData *)putData
                 success:(void (^)(NSDictionary *response))success
-                failure:(void(^)(NSError* error))failure {
+                failure:(void (^)(NSError* error))failure {
 
     // Build the HTTP request
-    NSData *postData = [NSJSONSerialization dataWithJSONObject:values
-                                                       options:kNilOptions
-                                                         error:nil];
-
     NSMutableURLRequest *request = [self createRequest:@"PUT"
                                            forEndpoint:endpoint
-                                              withData:postData];
+                                              withData:putData];
     
     // Assign the session to the main queue so the call happens immediately
     NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
