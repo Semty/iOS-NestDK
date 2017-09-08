@@ -23,6 +23,7 @@
 @interface NestStructureManager : NSObject
 
 @property (nonatomic, strong) id <NestStructureManagerDelegate>delegate;
+@property (nonatomic, strong) NSString *redirectURL;
 
 - (void)initialize;
 

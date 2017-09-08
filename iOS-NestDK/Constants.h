@@ -18,13 +18,15 @@
 #define iOS_NestDK_Constants_h
 
 extern NSString * const NestClientID;
-
 extern NSString * const NestClientSecret;
-
 extern NSString * const NestCurrentAPIDomain;
-
 extern NSString * const NestState;
-
 extern NSString * const RedirectURL;
+extern NSString * const NestAPIEndpoint;
+
+typedef enum {
+    neFAN_TIMER_ACTIVE,
+    neTARGET_TEMPERATURE_F
+} NestEndpoint;
 
 #endif

@@ -22,6 +22,7 @@
 @property (nonatomic, strong) UILabel *currentTempLabel;
 @property (nonatomic, strong) UILabel *targetTempLabel;
 @property (nonatomic, strong) UIButton *thermostatNameLabel;
+@property (nonatomic, strong) UILabel *currentModeLabel;
 
 @property (nonatomic, strong) UILabel *currentTempSuffix;
 @property (nonatomic, strong) UILabel *targetTempSuffix;
@@ -39,10 +40,11 @@
 
 @end
 
-#define CURRENT_Y_LEVEL 40
-#define TARGET_Y_LEVEL 95
-#define FAN_Y_LEVEL 150
-#define TITLE_FONT_SIZE 22
+#define MODE_Y_LEVEL 45
+#define CURRENT_Y_LEVEL 75
+#define TARGET_Y_LEVEL 130
+#define FAN_Y_LEVEL 185
+#define TITLE_FONT_SIZE 18
 #define TEMP_HEIGHT 45
 #define SUFFIX_HEIGHT 20
 #define SUFFIX_WIDTH 160
@@ -60,11 +62,14 @@
 #define FAN_TIMER_SUFFIX_ON @"fan timer (on)"
 #define FAN_TIMER_SUFFIX_OFF @"fan timer (off)"
 #define FAN_TIMER_SUFFIX_DISABLED @"fan timer (disabled)"
+#define MODE_SUFFIX @"mode"
 
 @implementation ThermostatView
 
 @synthesize currentTemp = _currentTemp;
 @synthesize targetTemp = _targetTemp;
+@synthesize hvacMode = _hvacMode;
+@synthesize fanTimerActive = _fanTimerActive;
 
 #pragma mark Setter Methods
 
@@ -88,6 +93,26 @@
     [self updateTargetTempLabel:targetTemp];
 }
 
+/**
+ * Provide the setter for the hvac mode.
+ * @param hvacMode The hvac mode to set hvacMode to.
+ */
+- (void)setHvacMode:(NSString*)hvacMode
+{
+    _hvacMode = hvacMode;
+    [self updateCurrentModeLabel:hvacMode];
+}
+
+/**
+ * Provide the setter for the fan timer.
+ * @param fanTimerActive The boolean of the fan timer.
+ */
+- (void)setFanTimerActive:(BOOL)fanTimerActive
+{
+    _fanTimerActive = fanTimerActive;
+    [self updateFanLabel:fanTimerActive];
+}
+
 #pragma mark View Setup
 
 - (id)initWithFrame:(CGRect)frame
@@ -107,6 +132,7 @@
         self.thermostatNameLabel = [self setupThermostatNameLabel];
         
         // Setup the labels
+        self.currentModeLabel = [self setupModeLabelWithY:MODE_Y_LEVEL];
         self.currentTempLabel = [self setupTempLabelWithY:CURRENT_Y_LEVEL];
         self.targetTempLabel = [self setupTempLabelWithY:TARGET_Y_LEVEL];
         self.currentTempSuffix = [self setupSuffixLabelWithText:CURRENT_SUFFIX andY:CURRENT_Y_LEVEL];
@@ -159,7 +185,8 @@
 {
     UIButton *thermostatButton = [[UIButton alloc] initWithFrame:CGRectMake(DEFAULT_PADDING, DEFAULT_PADDING, 280, 25)];
     [thermostatButton setTitle:TITLE_PLACEHOLDER forState:UIControlStateNormal];
-    [thermostatButton setTitleColor:[UIColor nestBlue] forState:UIControlStateNormal];
+    [thermostatButton setTitleColor:[UIColor uiBlue] forState:UIControlStateNormal];
+    thermostatButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [thermostatButton.titleLabel setFont:[UIFont fontWithName:BOLD_FONT size:TITLE_FONT_SIZE]];
     [thermostatButton addTarget:self action:@selector(thermostatNameButtonHit:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:thermostatButton];
@@ -172,6 +199,23 @@
 - (void)sliderMoving:(UISlider *)sender
 {
     self.isSlidingSlider = YES;
+}
+
+/**
+ * Setup an hvac mode label with a given Y value.
+ * @param yValue The yValue the label should be at.
+ * @return The new UILabel.
+ */
+- (UILabel *)setupModeLabelWithY:(int)yValue
+{
+    
+    UILabel *modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(DEFAULT_PADDING, yValue, self.bounds.size.width - (2 * DEFAULT_PADDING), SUFFIX_HEIGHT)];
+    [modeLabel setText:TITLE_PLACEHOLDER];
+    [modeLabel setTextColor:[UIColor darkGrayColor]];
+    [modeLabel setTextAlignment:NSTextAlignmentLeft];
+    [modeLabel setFont:[UIFont fontWithName:REGULAR_FONT size:TITLE_FONT_SIZE]];
+    [self addSubview:modeLabel];
+    return modeLabel;
 }
 
 /**
@@ -221,7 +265,7 @@
 {
     UISwitch *fanSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(DEFAULT_PADDING, FAN_Y_LEVEL, 79, 50)];
     [fanSwitch addTarget:self action:@selector(fanDidSwitch:) forControlEvents:UIControlEventValueChanged];
-    [fanSwitch setOnTintColor:[UIColor nestBlue]];
+    [fanSwitch setOnTintColor:[UIColor uiBlue]];
     [self addSubview:fanSwitch];
     return fanSwitch;
 }
@@ -233,7 +277,7 @@
 - (void)setupTempSlider
 {
     self.tempSlider = [[UISlider alloc] initWithFrame:CGRectMake(self.frame.size.width/2 + DEFAULT_PADDING, TARGET_Y_LEVEL, self.frame.size.width/2 - (DEFAULT_PADDING * 2), TEMP_HEIGHT)];
-    [self.tempSlider setTintColor:[UIColor nestBlue]];
+    [self.tempSlider setTintColor:[UIColor uiBlue]];
     [self.tempSlider addTarget:self action:@selector(sliderValueChanged:) forControlEvents:UIControlEventValueChanged];
     [self.tempSlider addTarget:self action:@selector(sliderMoving:) forControlEvents:UIControlEventTouchDown];
     [self.tempSlider addTarget:self action:@selector(sliderValueSettled:) forControlEvents:UIControlEventTouchUpInside];
@@ -272,6 +316,34 @@
     [self.currentTempLabel setFrame:CGRectMake(DEFAULT_PADDING, CURRENT_Y_LEVEL, textSize.width, TEMP_HEIGHT)];
     [self.currentTempLabel setText:newString];
     [self.currentTempSuffix setFrame:CGRectMake(DEFAULT_PADDING + 5 + textSize.width, CURRENT_Y_LEVEL + SUFFIX_HEIGHT - 3, SUFFIX_WIDTH, SUFFIX_HEIGHT)];
+}
+
+/**
+ * Update the current hvac mode label.
+ * @param newMode The hvac mode you wish to update to.
+ */
+- (void)updateCurrentModeLabel:(NSString*)newMode
+{
+    NSString *newString = [[NSString stringWithFormat:@"%@ %@", newMode, @" mode"] uppercaseString];
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont fontWithName:REGULAR_FONT size:TITLE_FONT_SIZE]};
+    CGSize textSize = [newString sizeWithAttributes:attributes];
+    
+    [self.currentModeLabel setFrame:CGRectMake(DEFAULT_PADDING, MODE_Y_LEVEL, textSize.width, SUFFIX_HEIGHT)];
+    [self.currentModeLabel setText:newString];
+}
+
+/**
+ * Update the fan label based on value of switch
+ * @param on The value of the switch
+ */
+- (void)updateFanLabel:(BOOL)on
+{
+    if (on) {
+        [self.fanSuffix setText:FAN_TIMER_SUFFIX_ON];
+    } else {
+        [self.fanSuffix setText:FAN_TIMER_SUFFIX_OFF];
+    }
 }
 
 #pragma mark Thermostat Interaction Methods
@@ -355,7 +427,7 @@
     self.isSlidingSlider = NO;
     
     [self.currentThermostat setTargetTemperatureF:[self tempSliderActualValue]];
-    [self saveThermostatChange];
+    [self saveThermostatChange:neTARGET_TEMPERATURE_F];
 }
 
 /**
@@ -392,7 +464,8 @@
 - (void)fanDidSwitch:(UISwitch *)sender
 {
     [self.currentThermostat setFanTimerActive:sender.isOn];
-    [self saveThermostatChange];
+    [self saveThermostatChange:neFAN_TIMER_ACTIVE];
+    [self updateFanLabel:sender.isOn];
 }
 
 /**
@@ -402,6 +475,10 @@
 - (void)turnFan:(BOOL)on
 {
     [self.fanSwitch setOn:on];
+    [self updateFanLabel:on];
+    
+    // Update the local state of the current thermostat
+    [self.currentThermostat setFanTimerActive:on];
 }
 
 /**
@@ -410,11 +487,15 @@
  */
 - (void)updateWithThermostat:(Thermostat *)thermostat
 {
+    
     // Set the current thermostat
     self.currentThermostat = thermostat;
     
     // Update the name of the thermostat
     [self.thermostatNameLabel setTitle:thermostat.nameLong forState:UIControlStateNormal];
+    
+    // Update the hvac mode of the thermostat
+    self.hvacMode = thermostat.hvacMode;
     
     // Update the current temp label
     self.currentTemp = thermostat.ambientTemperatureF;
@@ -425,16 +506,17 @@
     if (thermostat.hasFan) {
         [self.fanSwitch setEnabled:YES];
         [self turnFan:thermostat.fanTimerActive];
-
-        if (thermostat.fanTimerActive) {
-            [self.fanSuffix setText:FAN_TIMER_SUFFIX_ON];
-        } else {
-            [self.fanSuffix setText:FAN_TIMER_SUFFIX_OFF];
-        }
+        [self updateFanLabel:thermostat.fanTimerActive];
     } else {
         [self.fanSwitch setEnabled:NO];
         [self.fanSuffix setText:FAN_TIMER_SUFFIX_DISABLED];
     }
+    
+    // ensure the UIView is refresh immediately
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setNeedsDisplay];
+    });
+
 }
 
 /**
@@ -449,9 +531,9 @@
 /*
  * Thermostat was updated, save the change ONLINE!!!.
  */
-- (void)saveThermostatChange
+- (void)saveThermostatChange:(NestEndpoint)endpoint
 {
-    [self.delegate thermostatInfoChange:self.currentThermostat];
+    [self.delegate thermostatInfoChange:self.currentThermostat forEndpoint:endpoint];
 }
 
 @end

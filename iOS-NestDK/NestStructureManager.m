@@ -17,19 +17,40 @@
 #import "NestStructureManager.h"
 #import "Thermostat.h"
 #import "NestAuthManager.h"
-#import "FirebaseManager.h"
+#import "RESTManager.h"
 
 @implementation NestStructureManager
 
 /**
  * Gets the entire structure and converts it to
- * thermostat objects andreturns it as a dictionary.
+ * thermostat objects and returns it as a dictionary.
  */
 - (void)initialize
 {
-    [[FirebaseManager sharedManager] addSubscriptionToURL:@"structures/" withBlock:^(FDataSnapshot *snapshot) {
-        [self parseStructure:snapshot.value];
-    }];
+
+    [[RESTManager sharedManager] getData:@"structures"
+                                 success:^(NSDictionary *responseJSON) {
+        
+        [self parseStructure:responseJSON];
+     
+        } redirect:^(NSHTTPURLResponse *responseURL) {
+            
+            // If a redirect was thrown, make another call using the redirect URL
+            self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
+            
+            [[RESTManager sharedManager] getDataRedirect:self.redirectURL
+                                                 success:^(NSDictionary *responseJSON) {
+                
+                [self parseStructure:responseJSON];
+                
+            } failure:^(NSError *error) {
+                NSLog(@"NestStructureManager Redirect Error: %@", error);
+            }];
+        
+        } failure:^(NSError *error) {
+            NSLog(@"NestStructureManager Error: %@", error);
+        }];
+
 }
 
 /**
@@ -47,6 +68,7 @@
     }
     
     [self.delegate structureUpdated:returnStructure];
+    
 }
 
 /**

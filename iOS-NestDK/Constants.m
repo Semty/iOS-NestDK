@@ -17,16 +17,16 @@
 #import "Constants.h"
 
 
-// Replace this with your Nest Client ID (see https://developer.nest.com)
-NSString * const NestClientID = @"xxxx-xxxx-xxxx-xxxx";
+// Replace this with your Nest Client ID; see https://console.developers.nest.com/products
+NSString * const NestClientID = @"replace-with-your-client-id";
 
-// Replace this with your Nest Client Secret (see https://developer.nest.com)
-NSString * const NestClientSecret = @"xxxxxxXXXXXXXxxxxxxx";
+// Replace this with your Nest Client Secret; see https://console.developers.nest.com/products
+NSString * const NestClientSecret = @"replace-with-your-client-secret";
+
+// Change this if you want to use a different Redirect URL
+NSString * const RedirectURL = @"http://localhost:8080/auth/nest/callback";
 
 NSString * const NestCurrentAPIDomain = @"home.nest.com";
-
-NSString * const NestState = @"SOMESTATE";
-
-NSString * const RedirectURL = @"http://www.example.com";
-
+NSString * const NestState = @"STATE";
+NSString * const NestAPIEndpoint = @"https://developer-api.nest.com";
 

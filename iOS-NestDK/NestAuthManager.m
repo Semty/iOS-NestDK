@@ -73,6 +73,19 @@
 }
 
 /**
+ * Get the URL to deauthorize the connection.
+ * @return The URL to deauthorize the connection.
+ */
+- (NSString *)deauthorizationURL
+{
+    // Get the access token
+    NSString *authBearer = [NSString stringWithFormat:@"%@",
+                            [[NestAuthManager sharedManager] accessToken]];
+    
+    return [NSString stringWithFormat:@"https://api.%@/oauth2/access_tokens/%@", NestCurrentAPIDomain, authBearer];
+}
+
+/**
  * Get the URL for to get the access key.
  * @return The URL to get the access token from Nest.
  */
@@ -144,6 +157,35 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+/**
+ * Remove the access token and authorization code from storage
+ *    upon deauthorization.
+ */
+- (void)removeAuthorizationData
+{
+    
+    // If an access token exists, delete it
+    NSData *encodedObject = [[NSUserDefaults standardUserDefaults] objectForKey:@"accessToken"];
+    
+    if (encodedObject) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"accessToken"];
+        
+        //NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
+        //[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+        
+        NSLog(@"removeAccessToken");
+    }
+    
+    // If an authorization code exists, delete it
+    encodedObject = [[NSUserDefaults standardUserDefaults] objectForKey:@"authorizationCode"];
+
+    if (encodedObject) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"authorizationCode"];
+        
+        NSLog(@"removeAuthorizationCode");
+    }
+    
+}
 
 /**
  * Set the client's ID.
@@ -171,6 +213,12 @@
  */
 - (void)exchangeCodeForToken
 {
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    
+    // Create the response data
+    self.responseData = [[NSMutableData alloc] init];
+    
     // Get the accessURL
     NSString *accessURL = [self accessURL];
     
@@ -180,48 +228,71 @@
     [request setHTTPMethod:@"POST"];
     [request setValue:@"form-data" forHTTPHeaderField:@"Content-Type"];
     
-    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    [connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-    [connection start];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-}
-
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    // Create the response data
-    self.responseData = [[NSMutableData alloc] init];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    // Append the new data to the instance variable you declared
-    [self.responseData appendData:data];
-}
-
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse*)cachedResponse {
-    // Return nil to indicate not necessary to store a cached response for this connection
-    return nil;
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    // Assign the session to the main queue so the call happens immediately
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:nil
+                                                     delegateQueue:[NSOperationQueue mainQueue]];
     
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
-    // The request is complete and data has been received
-    // You can parse the stuff in your instance variable now
-    NSError* error;
-    NSDictionary* json = [NSJSONSerialization JSONObjectWithData:self.responseData options:kNilOptions error:&error];
-    
-    // Store the access key
-    long expiresIn = [[json objectForKey:@"expires_in"] longValue];
-    NSString *accessToken = [json objectForKey:@"access_token"];
-    [self setAccessToken:accessToken withExpiration:expiresIn];
-    
+    [[session dataTaskWithRequest:request completionHandler:
+      ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+          
+          NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+          NSLog(@"AuthManager Token Response Status Code: %ld", (long)[httpResponse statusCode]);
+          
+          [self.responseData appendData:data];
+          
+          // The request is complete and data has been received
+          // You can parse the stuff in your instance variable now
+          NSDictionary* json = [NSJSONSerialization JSONObjectWithData:self.responseData
+                                                               options:kNilOptions
+                                                                 error:&error];
+          
+          // Store the access key
+          long expiresIn = [[json objectForKey:@"expires_in"] longValue];
+          NSString *accessToken = [json objectForKey:@"access_token"];
+          [self setAccessToken:accessToken withExpiration:expiresIn];
+          
+          [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+          
+      }] resume];
+
 }
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    // The request has failed for some reason!
-    NSLog(@"Failed to get access key");
+#pragma mark - NestControlsViewControllerDelegate Methods
+
+/**
+ * Called from NestControlsViewControllerDelegate, lets
+ * the AuthManager know to deauthorize the Works with Nest connection
+ */
+- (void)deauthorizeConnection
+{
+    
+    NSLog(@"deauthorizeConnection");
+
+    // Get the deauthorizationURL
+    NSString *deauthURL = [self deauthorizationURL];
+    
+    // Create the DELETE request
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    [request setURL:[NSURL URLWithString:deauthURL]];
+    [request setHTTPMethod:@"DELETE"];
+    
+    // Assign the session to the main queue so the call happens immediately
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:nil
+                                                     delegateQueue:[NSOperationQueue mainQueue]];
+    
+    [[session dataTaskWithRequest:request completionHandler:
+      ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+          
+          NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+          NSLog(@"AuthManager Delete Response Status Code: %ld", (long)[httpResponse statusCode]);
+          
+      }] resume];
+
+    // Delete the access token and authorization code from storage
+    [self removeAuthorizationData];
+    
 }
 
 @end

@@ -62,16 +62,16 @@
 - (UIButton *)createNestConnectButton
 {
     UIButton *nestConnectButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 250, 130)];
-    [nestConnectButton setTitleColor:[UIColor nestBlue] forState:UIControlStateNormal];
-    [nestConnectButton setTitleColor:[UIColor nestBlueSelected] forState:UIControlStateHighlighted];
+    [nestConnectButton setTitleColor:[UIColor uiBlue] forState:UIControlStateNormal];
+    [nestConnectButton setTitleColor:[UIColor uiBlueSelected] forState:UIControlStateHighlighted];
     
-    [nestConnectButton setTitle:@"Connect with your nest account!" forState:UIControlStateNormal];
+    [nestConnectButton setTitle:@"Connect with your Nest account!" forState:UIControlStateNormal];
     
     [nestConnectButton.titleLabel setNumberOfLines:4];
     [nestConnectButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [nestConnectButton setTitleEdgeInsets:UIEdgeInsetsMake(0, 0, 0.0, 00.0)];
     
-    [nestConnectButton.layer setBorderColor:[UIColor nestBlue].CGColor];
+    [nestConnectButton.layer setBorderColor:[UIColor uiBlue].CGColor];
     [nestConnectButton.layer setCornerRadius:8.f];
     [nestConnectButton.layer setBorderWidth:3.f];
     [nestConnectButton.layer setMasksToBounds:YES];
@@ -165,7 +165,7 @@
 #pragma mark - Private Methods
 
 /**
- * Invalidate the check token timer
+ * Invalidate (turn off) the check token timer
  */
 - (void)invalidateTimer
 {
@@ -181,7 +181,11 @@
 - (void)setupcheckTokenTimer
 {
     [self invalidateTimer];
-    self.checkTokenTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(checkForAccessToken:) userInfo:nil repeats:YES];
+    self.checkTokenTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f
+                                                            target:self
+                                                          selector:@selector(checkForAccessToken:)
+                                                          userInfo:nil
+                                                           repeats:YES];
 }
 
 @end

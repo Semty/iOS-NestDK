@@ -15,10 +15,11 @@
  */
 
 #import "NestThermostatManager.h"
-#import "NestAuthManager.h"
-#import "FirebaseManager.h"
+#import "RESTManager.h"
 
 @interface NestThermostatManager ()
+
+@property (nonatomic, strong) NSTimer *pollTimer;
 
 @end
 
@@ -26,21 +27,75 @@
 #define HAS_FAN @"has_fan"
 #define TARGET_TEMPERATURE_F @"target_temperature_f"
 #define AMBIENT_TEMPERATURE_F @"ambient_temperature_f"
+#define HVAC_MODE @"hvac_mode"
 #define NAME_LONG @"name_long"
 #define THERMOSTAT_PATH @"devices/thermostats"
+#define POLL_INTERVAL 30.0f
 
 @implementation NestThermostatManager
 
 /**
- * Sets up a new Firebase connection for the thermostat provided
- * and observes for any change in /devices/thermostats/thermostatId.
- * @param thermostat The thermostat you want to watch changes for.
+ * Set up the polling timer.
+ * @param thermostat The thermostat you wish to poll for. The currently selected thermostat
+    if more than one exist in a structure.
  */
-- (void)beginSubscriptionForThermostat:(Thermostat *)thermostat
+- (void)setupPollTimer:(Thermostat *)thermostat
 {
-    [[FirebaseManager sharedManager] addSubscriptionToURL:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId] withBlock:^(FDataSnapshot *snapshot) {
-        [self updateThermostat:thermostat forStructure:snapshot.value];
+    [self invalidatePollTimer];
+    
+    // Enable the timer on the main thread and pass the thermostat
+    //   as a parameter (userInfo)
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.pollTimer = [NSTimer scheduledTimerWithTimeInterval:POLL_INTERVAL
+                                                          target:self
+                                                        selector:@selector(pollThermostat:)
+                                                        userInfo:thermostat
+                                                         repeats:YES];
+    });
+}
+
+/**
+ * Callback from the poll timer, gets the current state of the thermostat.
+ * @param theTimer The poll NSTimer object.
+ */
+- (void)pollThermostat:(NSTimer*)theTimer
+{
+    [self getStateForThermostat:[theTimer userInfo]];
+}
+
+/**
+ * Gets the current state of a thermostat and updates the display.
+ * @param thermostat The thermostat being checked for the current state.
+ */
+- (void)getStateForThermostat:(Thermostat *)thermostat
+{
+    
+    [[RESTManager sharedManager] getData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId]
+                                 success:^(NSDictionary *responseJSON) {
+        
+        [self updateThermostat:thermostat forStructure:responseJSON];
+        [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
+        
+    } redirect:^(NSHTTPURLResponse *responseURL) {
+        
+        // If a redirect was thrown, make another call using the redirect URL
+        self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
+        
+        [[RESTManager sharedManager] getDataRedirect:self.redirectURL
+                                             success:^(NSDictionary *responseJSON) {
+            
+            [self updateThermostat:thermostat forStructure:responseJSON];
+            [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
+            
+        } failure:^(NSError *error) {
+            NSLog(@"NestThermostatManager Redirect Error: %@", error);
+        }];
+        
+    } failure:^(NSError *error) {
+        NSLog(@"NestThermostatManager Error: %@", error);
+        
     }];
+    
 }
 
 /**
@@ -57,6 +112,11 @@
     if ([structure objectForKey:TARGET_TEMPERATURE_F]) {
         thermostat.targetTemperatureF = [[structure objectForKey:TARGET_TEMPERATURE_F] integerValue];
     }
+    
+    if ([structure objectForKey:HVAC_MODE]) {
+        thermostat.hvacMode = [structure objectForKey:HVAC_MODE];
+    }
+    
     if ([structure objectForKey:HAS_FAN]) {
         thermostat.hasFan = [[structure objectForKey:HAS_FAN] boolValue];
 
@@ -73,32 +133,81 @@
 }
 
 /**
- * Sets the thermostat values by using the Firebase API.
- * @param thermostat The thermost you wish to save.
- * @see https://www.firebase.com/docs/transactions.html
+ * Sets thermostat values via the Nest API.
+ * @param thermostat The thermostat you wish to update.
+ * @param endpoint The endpoint you wish to update.
  */
-- (void)saveChangesForThermostat:(Thermostat *)thermostat
+- (void)saveChangesForThermostat:(Thermostat *)thermostat forEndpoint:(NestEndpoint)endpoint
 {
-    NSMutableDictionary *values = [[NSMutableDictionary alloc] init];
     
-    [values setValue:[NSNumber numberWithInteger:thermostat.targetTemperatureF] forKey:TARGET_TEMPERATURE_F];
-    [values setValue:[NSNumber numberWithBool:thermostat.fanTimerActive] forKey:FAN_TIMER_ACTIVE];
+    NSData *jsonString;
+    NSNumber *temperature;
     
-    [[FirebaseManager sharedManager] setValues:values forURL:[NSString stringWithFormat:@"%@/%@/", THERMOSTAT_PATH, thermostat.thermostatId]];
+    // Build the JSON request based on the field that was changed
+    switch(endpoint)
+    {
+        case neFAN_TIMER_ACTIVE:
+            if (thermostat.hasFan) {
+                if (thermostat.fanTimerActive) {
+                    jsonString = [NSJSONSerialization dataWithJSONObject:@{ FAN_TIMER_ACTIVE : @YES }
+                                                                 options:kNilOptions
+                                                                   error:nil];
+                }
+                else {
+                    jsonString = [NSJSONSerialization dataWithJSONObject:@{ FAN_TIMER_ACTIVE : @NO }
+                                                                 options:kNilOptions
+                                                                   error:nil];
+                }
+            }
+            break;
+        case neTARGET_TEMPERATURE_F:
+            temperature = [NSNumber numberWithInteger:thermostat.targetTemperatureF];
+            jsonString = [NSJSONSerialization dataWithJSONObject:@{ TARGET_TEMPERATURE_F : temperature }
+                                                         options:kNilOptions
+                                                           error:nil];
+            break;
+        default:
+            break;
+    }
     
-//    // IMPORTANT to set withLocalEvents to NO
-//    // Read more here: https://www.firebase.com/docs/transactions.html
-//    [self.fireBase runTransactionBlock:^FTransactionResult *(FMutableData *currentData) {
-//        [currentData setValue:values];
-//        return [FTransactionResult successWithValue:currentData];
-//    } andCompletionBlock:^(NSError *error, BOOL committed, FDataSnapshot *snapshot) {
-//        if (error) {
-//            NSLog(@"Error: %@", error);
-//        }
-//    } withLocalEvents:NO];
+    // Make the write call for the specified thermostat
+    [[RESTManager sharedManager] setData:[NSString stringWithFormat:@"devices/thermostats/%@/", thermostat.thermostatId]
+                              withValues:jsonString
+                                 success:^(NSDictionary *responseJSON) {
+        
+        [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
+        
+    } redirect:^(NSHTTPURLResponse *responseURL) {
+        
+        // If a redirect was thrown, make another call using the redirect URL
+        self.redirectURL = [NSString stringWithFormat:@"%@", [responseURL URL]];
+        
+        [[RESTManager sharedManager] setDataRedirect:self.redirectURL
+                                          withValues:jsonString
+                                             success:^(NSDictionary *responseJSON) {
+            
+            [self.delegate errorDisplay:[responseJSON objectForKey:@"error"]];
+            
+        } failure:^(NSError *error) {
+            NSLog(@"NestThermostatManager Redirect Error: %@", error);
+        }];
+        
+    } failure:^(NSError *error) {
+        NSLog(@"NestThermostatManager Error: %@", error);
+    }];
 
 }
 
 
+/**
+ * Invalidate (turn off) the read polling timer
+ */
+- (void)invalidatePollTimer
+{
+    if ([self.pollTimer isValid]) {
+        [self.pollTimer invalidate];
+        self.pollTimer = nil;
+    }
+}
 
 @end

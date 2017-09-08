@@ -68,7 +68,7 @@
     
     // Add a uiwebview to take up the entire view (beneath the nav bar)
     self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 64, 320, self.view.frame.size.height - 64)];
-    [self.webView setBackgroundColor:[UIColor nestBlue]];
+    [self.webView setBackgroundColor:[UIColor uiBlue]];
     [self.webView setDelegate:self];
     [self.view addSubview:self.webView];
 }
@@ -116,10 +116,14 @@
 }
 
 /**
- * Intercept the requests to get the authorization code.
+ * Intercept the requests to get the authorization code before the webView loads
+ * 
+ * Ideally, the redirect URI contains a server-side script that obtains the access token,
+ *   to keep user credentials and the token from being exposed client-side.
  */
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
+    
     NSURL *url = [request URL];
     NSURL *redirectURL = [[NSURL alloc] initWithString:RedirectURL];
         
@@ -153,8 +157,9 @@
 
 		return NO;
 	}
+
+    return YES;
 	
-	return YES;
 }
 
 

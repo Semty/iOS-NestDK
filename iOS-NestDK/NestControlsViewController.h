@@ -16,6 +16,14 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol NestControlsViewControllerDelegate <NSObject>
+
+//- (void)deauthorizeConnection;
+
+@end
+
 @interface NestControlsViewController : UIViewController
+
+//@property (nonatomic, strong) id <NestControlsViewControllerDelegate>delegate;
 
 @end

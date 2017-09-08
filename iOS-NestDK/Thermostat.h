@@ -22,5 +22,6 @@
 @property (nonatomic) BOOL fanTimerActive;
 @property (nonatomic) NSInteger ambientTemperatureF;
 @property (nonatomic) NSInteger targetTemperatureF;
+@property (nonatomic, strong) NSString *hvacMode;
 
 @end
