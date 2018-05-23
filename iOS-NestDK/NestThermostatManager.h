@@ -26,7 +26,7 @@
 
 @interface NestThermostatManager : NSObject
 
-@property (nonatomic, strong) id <NestThermostatManagerDelegate>delegate;
+@property (nonatomic, weak) id <NestThermostatManagerDelegate>delegate;
 @property (nonatomic, strong) NSString *redirectURL;
 
 - (void)setupPollTimer:(Thermostat *)thermostat;

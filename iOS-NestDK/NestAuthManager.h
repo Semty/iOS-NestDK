@@ -22,7 +22,7 @@
 
 @interface NestAuthManager : NSObject <NSURLSessionDelegate>
 
-@property (nonatomic, strong) id <NestAuthManagerDelegate>delegate;
+@property (nonatomic, weak) id <NestAuthManagerDelegate>delegate;
 
 + (NestAuthManager *)sharedManager;
 

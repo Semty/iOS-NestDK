@@ -33,7 +33,7 @@
 @property (nonatomic) BOOL fanTimerActive;
 @property (nonatomic, strong) NSString *thermostatId;
 @property (nonatomic, strong) NSString *thermostateName;
-@property (nonatomic, strong) id <ThermostatViewDelegate>delegate;
+@property (nonatomic, weak) id <ThermostatViewDelegate>delegate;
 
 - (void)showLoading;
 - (void)hideLoading;
